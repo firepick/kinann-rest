@@ -37,6 +37,9 @@
     "type": "git",
     "url": "git+https://github.com/firepick/kinann-rest.git"
   },
+  "bin": {
+    "kinann-node": "./bin/kinann-node.js"
+  },
   "keywords": [
     "Kinann",
     "REST",
