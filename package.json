@@ -1,6 +1,6 @@
 {
   "name": "kinann-rest",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "REST service for Kinann neural network stepper motion control",
   "main": "src/server.js",
   "directories": {
@@ -9,6 +9,7 @@
     "doc": "doc"
   },
   "dependencies": {
+    "rest-bundle": "^0.1.0",
     "mathjs": "^3.9.2",
     "kinann": "^0.3",
     "body-parser": "1.14.1",
@@ -38,7 +39,7 @@
     "url": "git+https://github.com/firepick/kinann-rest.git"
   },
   "bin": {
-    "kinann-node": "./bin/kinann-node.js"
+    "kinann-node": "./scripts/kinann-node.js"
   },
   "keywords": [
     "Kinann",

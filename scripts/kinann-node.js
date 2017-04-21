@@ -47,7 +47,7 @@ app.all('*', function(req, res, next) {
 });
 
 var kinannService = new KinannRest(bundleOptions);
-kinannService.bindHandlers(app);
+kinannService.bindExpress(app);
 
 /////////// Startup
 

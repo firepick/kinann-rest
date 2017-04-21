@@ -1,3 +1,5 @@
+const ResourceMethod = require("./resource-method");
+
 (function(exports) {
     class RestBundle {
         constructor(name, options = {}) {
@@ -7,6 +9,10 @@
             this.name = name;
             this.$onSuccess = options.onSuccess || RestBundle.onSuccess;
             this.$onFail = options.onFail || RestBundle.onFail;
+        }
+
+        static get ResourceMethod() {
+            return ResourceMethod;
         }
 
         get handlers() {
@@ -39,25 +45,25 @@
             return promise;
         }
 
-        bindHandlers(app, handlers = this.handlers) {
+        bindExpress(express, handlers = this.handlers) {
             handlers.forEach((resource) => {
                 var mime = resource.mime || "application/json";
                 var method = (resource.method || "get").toUpperCase();
                 var path = "/" + this.name + "/" + resource.name;
                 if (method === "GET") {
-                    app.get(path, (req, res, next) =>
+                    express.get(path, (req, res, next) =>
                         this.process(req, res, next, resource.handler, mime))
                 } else if (method === "POST") {
-                    app.post(path, (req, res, next) =>
+                    express.post(path, (req, res, next) =>
                         this.process(req, res, next, resource.handler))
                 } else if (method === "PUT") {
-                    app.put(path, (req, res, next) =>
+                    express.put(path, (req, res, next) =>
                         this.process(req, res, next, resource.handler))
                 } else if (method === "DELETE") {
-                    app.delete(path, (req, res, next) =>
+                    express.delete(path, (req, res, next) =>
                         this.process(req, res, next, resource.handler))
                 } else if (method === "HEAD") {
-                    app.head(path, (req, res, next) =>
+                    express.head(path, (req, res, next) =>
                         this.process(req, res, next, resource.handler))
                 }
             });
