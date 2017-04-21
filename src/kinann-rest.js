@@ -1,30 +1,22 @@
 const Kinann = require("kinann");
-var version = require("../package.json").version;
-var RestBundle = require("./rest-bundle");
+const pkg = require("../package.json");
+var rb = require("rest-bundle");
 
 (function(exports) {
-    class KinannRest extends RestBundle {
-        constructor(options = {}) {
-            super("/kinann-rest", options);
+    class KinannRest extends rb.RestBundle {
+        constructor(name="kinann", options = {}) {
+            super(name, options);
         }
 
-        get handlers() {
-            return [{
-                path: "/version",
-                handler: this.getVersion,
-                mime: "text/html",
-            }, {
-                path: "/error",
-                handler: this.getError,
-            }]
-        }
+        get handlers() { return [
+            new rb.ResourceMethod("get", "identity", this.getIdentity),
+        ]}
 
-        getError(req, res, next) {
-            throw new Error("I died");
-        }
-
-        getVersion(req, res, next) {
-            return "kinann-rest " + version;
+        getIdentity(req, res, next) {
+            return {
+                name: pkg.name,
+                version: pkg.version,
+            }
         }
 
     } //// class KinannRest
