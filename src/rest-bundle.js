@@ -1,10 +1,10 @@
 (function(exports) {
     class RestBundle {
-        constructor(service, options = {}) {
-            if (service == null) {
-                throw new Error("service path is required");
+        constructor(name, options = {}) {
+            if (name == null) {
+                throw new Error("bundle name is required");
             }
-            this.service = service;
+            this.name = name;
             this.$onSuccess = options.onSuccess || RestBundle.onSuccess;
             this.$onFail = options.onFail || RestBundle.onFail;
         }
@@ -42,12 +42,22 @@
         bindHandlers(app, handlers = this.handlers) {
             handlers.forEach((resource) => {
                 var mime = resource.mime || "application/json";
-                var method = resource.method || "GET";
+                var method = (resource.method || "get").toUpperCase();
+                var path = "/" + this.name + "/" + resource.name;
                 if (method === "GET") {
-                    app.get(this.service + resource.path, (req, res, next) =>
+                    app.get(path, (req, res, next) =>
                         this.process(req, res, next, resource.handler, mime))
                 } else if (method === "POST") {
-                    app.post(this.service + resource.path, (req, res, next) =>
+                    app.post(path, (req, res, next) =>
+                        this.process(req, res, next, resource.handler))
+                } else if (method === "PUT") {
+                    app.put(path, (req, res, next) =>
+                        this.process(req, res, next, resource.handler))
+                } else if (method === "DELETE") {
+                    app.delete(path, (req, res, next) =>
+                        this.process(req, res, next, resource.handler))
+                } else if (method === "HEAD") {
+                    app.head(path, (req, res, next) =>
                         this.process(req, res, next, resource.handler))
                 }
             });
