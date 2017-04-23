@@ -9,7 +9,7 @@
     "doc": "doc"
   },
   "dependencies": {
-    "rest-bundle": "^0.2.1",
+    "rest-bundle": "^0.4.0",
     "mathjs": "^3.9.2",
     "kinann": "^0.3",
     "body-parser": "1.14.1",
