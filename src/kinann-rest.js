@@ -4,12 +4,16 @@ const Variable = Kinann.Variable;
 const StepperDrive = Kinann.StepperDrive;
 const DriveFrame = Kinann.DriveFrame;
 const pkg = require("../package.json");
+const path = require("path");
 var rb = require("rest-bundle");
 
 (function(exports) {
     class KinannRest extends rb.RestBundle {
         constructor(name="kinann", options = {}) {
-            super(name, options);
+            super(name, Object.assign({
+                appsrc: path.join(path.dirname(__filename), "ui/app.src"),
+            },options));
+
             var handlers = [
                 this.resourceMethod("get", "identity", this.getIdentity),
                 this.resourceMethod("get", "state", this.getState),
