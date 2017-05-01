@@ -3,7 +3,6 @@ const Factory = Kinann.Factory;
 const Variable = Kinann.Variable;
 const StepperDrive = Kinann.StepperDrive;
 const DriveFrame = Kinann.DriveFrame;
-const pkg = require("../package.json");
 const path = require("path");
 var rb = require("rest-bundle");
 
@@ -11,17 +10,15 @@ var rb = require("rest-bundle");
     class KinannRest extends rb.RestBundle {
         constructor(name="kinann", options = {}) {
             super(name, Object.assign({
-                appsrc: path.join(path.dirname(__filename), "ui/app.src"),
+                srcPkg: require("../package.json"),
             },options));
 
-            var handlers = [
-                this.resourceMethod("get", "identity", this.getIdentity),
-                this.resourceMethod("get", "state", this.getState),
-                this.resourceMethod("get", "position", this.getPosition),
-                this.resourceMethod("post", "position", this.setPosition),
-            ];
             Object.defineProperty(this, "handlers", {
-                value: handlers,
+                value: super.handlers.concat([
+                    this.resourceMethod("get", "state", this.getState),
+                    this.resourceMethod("get", "position", this.getPosition),
+                    this.resourceMethod("post", "position", this.setPosition),
+                ]),
             });
             this.drives = options.drives || [
                 new StepperDrive.BeltDrive({
@@ -51,13 +48,6 @@ var rb = require("rest-bundle");
             return this.knn = knn;
         }
 
-        getIdentity(req, res, next) {
-            return {
-                name: pkg.name,
-                version: pkg.version,
-            }
-        }
-
         getState(req, res, next) {
             return this.df.state;
         }
@@ -76,13 +66,13 @@ var rb = require("rest-bundle");
         }
 
         setPosition(req, res, next) {
-            var position = req.data;
-            if (position.axis) {
+            var position = req.body;
+            if (position.axis) { // priority #1
                 this.df.axisPos = position.axis;
-            } else if (position.motor) {
+            } else if (position.motor) { // priority #2
                 this.df.axisPos = this.df.toAxisPos(position.motor);
-            } else if (position.world) {
-                throw new Error("not implemented");
+            } else if (position.world) { // priority #3
+                throw new Error("world position not implemented");
             } else {
                 throw new Error("unknown position:" + JSON.stringify(position));
             }
@@ -93,33 +83,3 @@ var rb = require("rest-bundle");
 
     module.exports = exports.KinannRest = KinannRest;
 })(typeof exports === "object" ? exports : (exports = {}));
-
-(typeof describe === 'function') && describe("KinannRest", function() {
-    const should = require("should");
-    const MockExpress = require("rest-bundle").MockExpress;
-    const KinannRest = exports.KinannRest;
-    var application_json_200 = {
-        statusCode: 200,
-        type: "application/json",
-    }
-
-    it("TBD", function() {
-        var app = new MockExpress();
-        var service = new KinannRest("kinann"); 
-        service.bindExpress(app);
-        return;
-        var position123 = {
-            axis: [1,2,3],
-            motor: [1,2,3],
-        }
-        app.mockPOST("/kinann/position", position123, (res) => {
-            res.should.properties(application_json_200);
-            res.data.should.properties({
-                motor: [100,200,7680],
-                axis: [1,2,3],
-            });
-            app.count_next.should.equal(1);
-            done();
-        }, position123);
-    });
-})

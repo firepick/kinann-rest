@@ -12,16 +12,16 @@ var core_1 = require("@angular/core");
 var AppComponent = (function () {
     function AppComponent() {
         var _this = this;
-        this.name = 'REST-BUNDLE-ui';
-        this.date = new Date();
-        setInterval(function () { return (_this.date = new Date()); }, 1000);
+        this.name = 'demo-ui';
+        this.seconds = 0;
+        setInterval(function () { return (_this.seconds++); }, 1000);
     }
     return AppComponent;
 }());
 AppComponent = __decorate([
     core_1.Component({
-        selector: 'REST-BUNDLE-ui',
-        template: "<div class=\"rb-root\"><h1>&lt;{{name}}&gt;</h1>{{date}}</div>",
+        selector: 'demo-ui',
+        template: "<div class=\"demo-ui\">demo-ui AppComponent {{seconds}}</div>",
     }),
     __metadata("design:paramtypes", [])
 ], AppComponent);

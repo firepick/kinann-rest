@@ -1,106 +1,141 @@
 const should = require("should");
 const KinannRest = require("../src/kinann-rest");
-const MockExpress = require("rest-bundle").MockExpress;
+const supertest = require('supertest');
 
 (typeof describe === 'function') && describe("KinannRest", function() {
+
     var pkg = require("../package.json");
     var application_json_200 = {
         statusCode: 200,
         type: "application/json",
     }
 
-    it("/identity returns Kinann REST identity", function(done) {
-        var app = new MockExpress();
-        var service = new KinannRest("kinann"); 
-        service.bindExpress(app);
-        app.mockGET("/kinann/identity", (res) => {
-            res.should.properties(application_json_200);
-            res.data.should.properties({
+    it(" GET /identity returns Kinann REST identity", function(done) {
+        var app = require("../scripts/kinann-node.js");
+        supertest(app).get("/kinann-rest/identity").expect((res) => {
+            res.statusCode.should.equal(200);
+            res.headers["content-type"].should.match(/json/);
+            res.headers["content-type"].should.match(/utf-8/);
+            res.body.should.properties({
                 name: pkg.name,
+                package: "kinann-rest",
                 version: pkg.version,
             });
-            app.count_next.should.equal(1);
-            done();
-        });
+        }).end((err,res) => {if (err) throw err; else done(); });
     })
     it("GET /state returns DriveFrame state", function(done) {
-        var app = new MockExpress();
-        var service = new KinannRest("pnp"); 
-        service.bindExpress(app);
-        app.mockGET("/pnp/state", (res) => {
-            res.should.properties(application_json_200);
-            should.deepEqual(res.data, service.df.state);
-            app.count_next.should.equal(1);
-            done();
-        });
-        service.df.state.should.instanceOf(Array);
-        service.df.state.length.should.not.below(3);
+        var app = require("../scripts/kinann-node.js");
+        var service = app.restService;
+        supertest(app).get("/kinann-rest/state").expect((res) => {
+            res.statusCode.should.equal(200);
+            res.headers["content-type"].should.match(/json/);
+            res.headers["content-type"].should.match(/utf-8/);
+            should.deepEqual(res.body, service.df.state);
+            // drive frame state
+            service.df.state.should.instanceOf(Array); 
+            service.df.state.length.should.equal(6);
+        }).end((err,res) => {if (err) throw err; else done(); });
     });
     it("GET /position returns DriveFrame position", function(done) {
-        var app = new MockExpress();
-        var service = new KinannRest("paste"); 
-        service.bindExpress(app);
-        app.mockGET("/paste/position", (res) => {
-            res.should.properties(application_json_200);
-            res.data.should.properties({
+        var app = require("../scripts/kinann-node.js");
+        var service = app.restService;
+        supertest(app).get("/kinann-rest/position").expect((res) => {
+            res.statusCode.should.equal(200);
+            res.headers["content-type"].should.match(/json/);
+            res.headers["content-type"].should.match(/utf-8/);
+            res.body.should.properties({
                     motor: [0,0,0],
                     axis: [0,0,0],
             });
-            app.count_next.should.equal(1);
-            done();
-        });
+        }).end((err,res) => {if (err) throw err; else done(); });
     });
     it("POST /position sets DriveFrame position in axis coordinates", function(done) {
-        var app = new MockExpress();
-        var service = new KinannRest("drill"); 
-        service.bindExpress(app);
-
+        var app = require("../scripts/kinann-node.js");
+        var service = app.restService;
         var axis123 = {
             axis: [1,2,3],
         }
-        app.mockPOST("/drill/position", axis123, (res) => {
-            res.should.properties(application_json_200);
-            res.data.should.properties({
+        supertest(app).post("/kinann-rest/position").send(axis123).expect((res) => {
+            res.statusCode.should.equal(200);
+            res.headers["content-type"].should.match(/json/);
+            res.headers["content-type"].should.match(/utf-8/);
+            should.deepEqual(res.body, {
                 motor: [100,200,7680],
                 axis: [1,2,3],
             });
-            app.count_next.should.equal(1);
-            done();
-        }, axis123);
+        }).end((err,res) => {if (err) throw err; else done(); });
     })
     it("POST /position sets DriveFrame position in motor coordinates", function(done) {
-        var app = new MockExpress();
-        var service = new KinannRest("stamp"); 
-        service.bindExpress(app);
+        var app = require("../scripts/kinann-node.js");
+        var service = app.restService;
         var motor123 = {
             motor: [100,200,7680],
         }
-        app.mockPOST("/stamp/position", motor123, (res) => {
-            res.should.properties(application_json_200);
-            res.data.should.properties({
+        supertest(app).post("/kinann-rest/position").send(motor123).expect((res) => {
+            res.statusCode.should.equal(200);
+            res.headers["content-type"].should.match(/json/);
+            res.headers["content-type"].should.match(/utf-8/);
+            should.deepEqual(res.body, {
                 motor: [100,200,7680],
                 axis: [1,2,3],
             });
-            app.count_next.should.equal(1);
-            done();
-        }, motor123);
+        }).end((err,res) => {if (err) throw err; else done(); });
     });
     it("POST /position priority is: 1) axis, 2) motor", function(done) {
-        var app = new MockExpress();
-        var service = new KinannRest("kinann"); 
-        service.bindExpress(app);
-        var position123 = {
+        var app = require("../scripts/kinann-node.js");
+        var service = app.restService;
+        var ambiguous123 = {
             axis: [1,2,3],
             motor: [1,2,3],
         }
-        app.mockPOST("/kinann/position", position123, (res) => {
-            res.should.properties(application_json_200);
-            res.data.should.properties({
+        supertest(app).post("/kinann-rest/position").send(ambiguous123).expect((res) => {
+            res.statusCode.should.equal(200);
+            res.headers["content-type"].should.match(/json/);
+            res.headers["content-type"].should.match(/utf-8/);
+            should.deepEqual(res.body, {
                 motor: [100,200,7680],
                 axis: [1,2,3],
             });
-            app.count_next.should.equal(1);
-            done();
-        }, position123);
+        }).end((err,res) => {if (err) throw err; else done(); });
     });
+    it("POST /position requires valid position", function(done) {
+        var app = require("../scripts/kinann-node.js");
+        var service = app.restService;
+        supertest(app).post("/kinann-rest/position").send({here:42}).expect((res) => {
+            res.statusCode.should.equal(500);
+            res.headers["content-type"].should.match(/json/);
+            res.headers["content-type"].should.match(/utf-8/);
+            should.deepEqual(res.body, {
+                error: 'unknown position:{"here":42}',
+            });
+        }).end((err,res) => {if (err) throw err; else done(); });
+    });
+    it("GET /ui returns index HTML", function(done) {
+        var app = require("../scripts/kinann-node.js");
+
+        supertest(app).get("/kinann-rest/ui").expect((res) => {
+            res.statusCode.should.equal(302); // redirect
+            res.headers["content-type"].should.match(/text/);
+            res.headers["content-type"].should.match(/utf-8/);
+            res.headers["location"].should.equal("/kinann-rest/ui/index-jit");
+        }).end((err,res) => {if (err) throw err; });
+
+        supertest(app).get("/kinann-rest/ui/index-jit").expect((res) => {
+            res.statusCode.should.equal(200); 
+            res.headers["content-type"].should.match(/html/);
+            res.headers["content-type"].should.match(/utf-8/);
+            res.text.should.match(/<html>/);
+            res.text.should.match(/<index-link index="jit"/);
+            res.text.should.match(/service="kinann-rest"/); // EJS injects service name
+        }).end((err,res) => {if (err) throw err; else done(); });
+    })
+    it("GET /ui/app returns Angular static content", function(done) {
+        var app = require("../scripts/kinann-node.js");
+
+        supertest(app).get("/kinann-rest/ui/app/main-jit.js").expect((res) => {
+            res.statusCode.should.equal(200); // redirect
+            res.headers["content-type"].should.match(/application\/javascript/);
+            res.text.should.match(/bootstrapModule/);
+        }).end((err,res) => {if (err) throw err; else done(); });
+    })
 })
