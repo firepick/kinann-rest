@@ -9,6 +9,11 @@
     "lib": ["es2015", "dom"],
     "noImplicitAny": true,
     "suppressImplicitAnyIndexErrors": true
-  }
+  },
+  "exclude": [
+    "components.d.ts",
+    "components.js",
+    "lib/**/*"
+  ]
 }
 

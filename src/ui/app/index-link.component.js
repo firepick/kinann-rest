@@ -21,8 +21,8 @@ var IndexLinkComponent = (function () {
 IndexLinkComponent = __decorate([
     core_1.Component({
         selector: 'index-link',
+        styles: ["\n        h1 {\n            font-size: 120%;\n            font-weight: 700;\n            color: #339;\n        }\n    "],
         template: "<!--bq-->\n    <div>\n        <h1>/{{service}}/ui/index-{{index}}</h1>\n        This is the home page for the \"{{service}}\" REST service.\n        The home page is available in different configurations:\n\n        <ul>\n            <li><a href=\"index-jit\">JIT Development</a> uses JIT (runtime) compiled Angular components \n            <li><a href=\"index-aot\">AOT Development</a> uses AOT pre-compiled Angular components \n            <li><a href=\"index-dist\">Production</a> uses WebPack-ed AOT pre-compiled Angular components\n        </ul>\n\n        Each RestBundle provides a REST service along with one or more Angular user interface components.\n        Here we show the <code>&lt;rest-bundle-identity&gt;</code> Angular component which displays the information returned\n        by the <code>/{{service}}/identity</code> REST GET method.\n    </div>\n    <!--bq-->",
-        styleUrls: ['./rest-bundle.module.css'],
     }),
     __metadata("design:paramtypes", [core_1.ElementRef])
 ], IndexLinkComponent);

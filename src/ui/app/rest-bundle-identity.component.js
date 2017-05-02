@@ -43,7 +43,7 @@ RestBundleIdentityComponent = __decorate([
     core_1.Component({
         selector: 'rest-bundle-identity',
         template: "\n        <div class=\"rb-root\">\n            <table>\n                <caption>&lt;{{name}}&gt;</caption>\n                <tr><th>Description:</th><td>{{description}}</td></tr>\n                <tr><th>Service:</th><td>{{service}}/identity</td></tr>\n                <tr><th>Package:</th><td>{{package}}</td></tr>\n                <tr><th>Version:</th><td>{{version}}</td></tr>\n                <tr><th>Date:</th><td>{{date}}</td></tr>\n            </table>\n        </div>\n        ",
-        styleUrls: ['./rest-bundle.module.css'],
+        styles: ["\n        .rb-root {\n            padding: 5pt;\n            border-radius: 5px;\n            border: 1pt solid #555;\n            background-color: #eee;\n            font-family: Verdata,sans-serif;\n        }\n        th {\n            text-align: left;\n        }\n        caption {\n            font-weight: 700;\n            font-size: 110%;\n            color: #339;\n            text-align: left;\n        }\n    "],
         providers: [],
     }),
     __metadata("design:paramtypes", [core_1.ElementRef, http_1.Http])
