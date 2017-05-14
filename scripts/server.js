@@ -3,7 +3,6 @@
 const path = require("path");
 const express = require('express');
 const app = module.exports = express();
-const RestBundle = require("../src/rest-bundle");
 const KinannRest = require("../src/kinann-rest");
 const winston = require("winston");
 
@@ -21,7 +20,7 @@ app.use("/", express.static(path.join(__dirname, "../src/ui")));
 app.use("/dist", express.static(path.join(__dirname, "../dist")));
 
 var bundles = services.map((name,index) => {
-    winston.info("binding RestBundle(", name, ") to express");
+    winston.info("binding KinannRest(", name, ") to express");
     return new KinannRest(name).bindExpress(app);
 });
 
