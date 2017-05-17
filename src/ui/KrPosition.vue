@@ -3,7 +3,8 @@
 <v-card> 
     <v-card-row class="grey lighten-4"> 
         <v-card-text>
-            Position {{position}}
+            Axis {{axis}}
+            World {{world}}
         </v-card-text> 
     </v-card-row> 
 </v-card>
@@ -11,21 +12,38 @@
 </template>
 <script>
 
-var grid = require('vue-g-row-col');
+import RestBundle from "rest-bundle/vue";
 
 export default {
-    mixins: [ require("./mixins/rb-service.js") ],
+    //mixins: [ require("./mixins/rb-service.js") ],
+    mixins: [ RestBundle.RbService ],
+    props: {
+        model: {
+            required: false,
+            type: String,
+            default: "position",
+        }
+    },
     data: function() {
+        this.restBundleServices();
+        this.$store.commit("restBundleServices/updateRestBundle", {
+            service: this.service,
+            model: this.model,
+            axis: [12,34,56],
+            world: [1,2,3],
+        });
         return {
             showDetail: false, 
         }
     },
     computed: {
-        position() {
-            return this.$store.state.position || [1,2,3];
+        axis() {
+            return this.modelState && this.modelState.axis || "axis?";
+        },
+        world() {
+            return this.modelState && this.modelState.world || "world?";
         },
     },
-    components: Object.assign({}, grid),
     methods: {
         blam: function(v) {
             console.log("BLAM",v);

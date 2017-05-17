@@ -35,6 +35,11 @@
     see a red <v-icon small class="red--text text--darken-1" >error</v-icon>
     </p>
 
+    <h5>Vue Components <code>&lt;rb-state&gt;</code></h5>
+    <p>
+    </p>
+    <rb-state></rb-state>
+
 </div>
 
 </template> <!-- ====================================== --> <script>
