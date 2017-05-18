@@ -1,13 +1,25 @@
 <template>
 
-<v-card> 
-    <v-card-row class="grey lighten-4"> 
-        <v-card-text>
-            Axis {{axis}}
-            World {{world}}
-        </v-card-text> 
-    </v-card-row> 
-</v-card>
+    <v-select xs2 v-bind:items='posItems'
+        v-model="posDisplay"
+        class="input-group--focused "
+        light chips persistent-hint
+        multiple
+        item-value="text" >
+        <template slot="selection" scope="data">
+          <v-chip 
+            @input="data.parent.selectItem(data.item)"
+            @click.native.stop
+            close
+            class="chip--select-multi pl-4 "
+            :key="data.item"
+          >
+            <v-row v-show='data.item === "Stepper"'> {{data.item}}: <div v-for="coord in stepperPos" :key="coord" class="">&nbsp;&nbsp;{{coord}}</div>&nbsp;</v-row>
+            <v-row v-show='data.item === "Axis"'> {{data.item}}: <div v-for="coord in axisPos" :key="coord" class="">&nbsp;&nbsp;{{coord}}</div>&nbsp;</v-row>
+            <v-row v-show='data.item === "World"'> {{data.item}}: <div v-for="coord in worldPos" :key="coord" class="">&nbsp;&nbsp;{{coord}}</div>&nbsp;</v-row>
+          </v-chip>
+        </template>
+    </v-select>
 
 </template>
 <script>
@@ -21,7 +33,7 @@ export default {
         model: {
             required: false,
             type: String,
-            default: "position",
+            default: "kinann",
         }
     },
     data: function() {
@@ -29,19 +41,29 @@ export default {
         this.$store.commit("restBundleServices/updateRestBundle", {
             service: this.service,
             model: this.model,
-            axis: [12,34,56],
-            world: [1,2,3],
+            stepperPos: [1000,2000,3000],   
+            axisPos: [12,34,56],
+            worldPos: [1,2,3],
         });
         return {
             showDetail: false, 
+            posDisplay: ["Axis","Stepper","World"],
+            posItems: [
+                "Stepper",
+                "Axis",
+                "World",
+            ],
         }
     },
     computed: {
-        axis() {
-            return this.modelState && this.modelState.axis || "axis?";
+        stepperPos() {
+            return this.modelState && this.modelState.stepperPos || "stepperPos?";
         },
-        world() {
-            return this.modelState && this.modelState.world || "world?";
+        axisPos() {
+            return this.modelState && this.modelState.axisPos || "axisPos?";
+        },
+        worldPos() {
+            return this.modelState && this.modelState.worldPos || "worldPos?";
         },
     },
     methods: {
