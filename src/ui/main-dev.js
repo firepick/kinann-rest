@@ -1,9 +1,7 @@
-console.log("hello");
 import Vue from 'vue';
 import Vuex from 'vuex';
 import Vuetify from 'vuetify';
 import RestBundle from "rest-bundle/vue";
-console.log("RestBundle", Object.keys(RestBundle));
 import Dev from './Dev.vue';
 require('./stylus/main.styl')
 

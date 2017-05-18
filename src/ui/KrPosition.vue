@@ -14,9 +14,9 @@
             class="chip--select-multi pl-4 "
             :key="data.item"
           >
-            <v-row v-show='data.item === "Stepper"'> {{data.item}}: <div v-for="coord in stepperPos" :key="coord" class="">&nbsp;&nbsp;{{coord}}</div>&nbsp;</v-row>
-            <v-row v-show='data.item === "Axis"'> {{data.item}}: <div v-for="coord in axisPos" :key="coord" class="">&nbsp;&nbsp;{{coord}}</div>&nbsp;</v-row>
-            <v-row v-show='data.item === "World"'> {{data.item}}: <div v-for="coord in worldPos" :key="coord" class="">&nbsp;&nbsp;{{coord}}</div>&nbsp;</v-row>
+            <v-row v-show='data.item === "Stepper"'> {{data.item}}: <div v-for="coord in position.motor" :key="coord" class="">&nbsp;&nbsp;{{coord}}</div>&nbsp;</v-row>
+            <v-row v-show='data.item === "Axis"'> {{data.item}}: <div v-for="coord in position.axis" :key="coord" class="">&nbsp;&nbsp;{{coord}}</div>&nbsp;</v-row>
+            <v-row v-show='data.item === "World"'> {{data.item}}: <div v-for="coord in position.world" :key="coord" class="">&nbsp;&nbsp;{{coord}}</div>&nbsp;</v-row>
           </v-chip>
         </template>
     </v-select>
@@ -25,9 +25,9 @@
 <script>
 
 import RestBundle from "rest-bundle/vue";
+import axios from 'axios';
 
 export default {
-    //mixins: [ require("./mixins/rb-service.js") ],
     mixins: [ RestBundle.RbService ],
     props: {
         model: {
@@ -37,14 +37,6 @@ export default {
         }
     },
     data: function() {
-        this.restBundleServices();
-        this.$store.commit("restBundleServices/updateRestBundle", {
-            service: this.service,
-            model: this.model,
-            stepperPos: [1000,2000,3000],   
-            axisPos: [12,34,56],
-            worldPos: [1,2,3],
-        });
         return {
             showDetail: false, 
             posDisplay: ["Axis","Stepper","World"],
@@ -55,21 +47,21 @@ export default {
             ],
         }
     },
+    created( ){
+        axios.get(this.origin + "/" +this.service+ "/position", {
+        })
+        .then(res => {
+            this.commit({ position: res.data });
+        })
+        .catch(err => {
+        });
+    },
     computed: {
-        stepperPos() {
-            return this.modelState && this.modelState.stepperPos || "stepperPos?";
-        },
-        axisPos() {
-            return this.modelState && this.modelState.axisPos || "axisPos?";
-        },
-        worldPos() {
-            return this.modelState && this.modelState.worldPos || "worldPos?";
+        position() {
+            return this.modelState && this.modelState.position || "position?";
         },
     },
     methods: {
-        blam: function(v) {
-            console.log("BLAM",v);
-        },
     }
 }
 

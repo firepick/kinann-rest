@@ -45,7 +45,6 @@ export default {
         },
     },
     mounted() {
-        console.log("service mounted");
     },
     components: {
         KrPosition
