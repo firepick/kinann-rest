@@ -15,6 +15,7 @@ var rb = require("rest-bundle");
 
             Object.defineProperty(this, "handlers", {
                 value: super.handlers.concat([
+                    this.resourceMethod("get", "drives", this.getDrives),
                     this.resourceMethod("get", "state", this.getState),
                     this.resourceMethod("get", "position", this.getPosition),
                     this.resourceMethod("post", "position", this.setPosition),
@@ -48,10 +49,6 @@ var rb = require("rest-bundle");
             return this.knn = knn;
         }
 
-        getState(req, res, next) {
-            return this.df.state;
-        }
-
         positionResponse() {
             var axisPos = this.df.axisPos;
             var motorPos = this.df.toMotorPos(axisPos);
@@ -77,6 +74,14 @@ var rb = require("rest-bundle");
                 throw new Error("unknown position:" + JSON.stringify(position));
             }
             return this.positionResponse();
+        }
+
+        getDrives(req, res, next) {
+            return this.drives;
+        }
+
+        getState(req, res, next) {
+            return this.df.state;
         }
 
     } //// class KinannRest

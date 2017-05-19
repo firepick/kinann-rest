@@ -5,23 +5,29 @@
     <v-tabs grow>
         <v-card class="primary">
             <v-card-title>
-            <span class="light-blue--text">{{package.name}} {{package.version}} </span>
-            <v-spacer></v-spacer>
-            <span class="light-blue--text">development application</span>
+                <span class="light-blue--text">{{package.name}} {{package.version}} </span>
+                <v-spacer></v-spacer>
+                <span class="light-blue--text">development application</span>
             </v-card-title>
         </v-card>
-            <v-tab-item href="#app-tab-1" slot="activators"> Introduction.vue </v-tab-item>
-            <v-tab-item href="#app-tab-2" slot="activators"> AllServices.vue </v-tab-item>
-            <v-tab-item href="#app-tab-3" slot="activators"> Service.vue </v-tab-item>
-            <v-tab-content id="app-tab-1" slot="content" ><v-card> <v-card-text>
-                <introduction ></introduction>
-                </v-card-text></v-card></v-tab-content> 
+        <v-tab-item href="#app-tab-1" slot="activators"> Introduction.vue </v-tab-item>
+        <v-tab-item href="#app-tab-2" slot="activators"> AllServices.vue </v-tab-item>
+        <v-tab-item href="#app-tab-3" slot="activators"> Service.vue </v-tab-item>
+        <v-tab-content id="app-tab-1" slot="content" ><v-card> <v-card-text>
+            <introduction ></introduction>
+            </v-card-text></v-card></v-tab-content> 
         <v-tab-content id="app-tab-2" slot="content" ><v-card> <v-card-text>
             <all-services ></all-services>
-            </v-card-text> </v-card> </v-tab-content> 
-        <v-tab-content id="app-tab-3" slot="content" ><v-card> <v-card-text>
+            </v-card-text> </v-card> 
+        </v-tab-content> 
+        <v-tab-content id="app-tab-3" slot="content" >
+            <v-card> <v-card-text>
+                <v-card-row><v-spacer/><a target='_blank'  :href='productionUrl("/test/ui")' >  
+                    Service Home Page (production)</a>
+                    </v-card-row>
             <service ></service>
-            </v-card-text> </v-card> </v-tab-content> 
+            </v-card-text> </v-card> 
+        </v-tab-content> 
     </v-tabs>
 </v-app>
 
@@ -37,6 +43,14 @@ export default {
         return {
             package: require("../../package.json"),
         }
+    },
+    methods: {
+        productionUrl(path) {
+            var host = location.port === "4000" 
+                ? location.hostname + ":8080"
+                : location.host;
+            return "http://" + host + path;
+        },
     },
     components: {
         Introduction,

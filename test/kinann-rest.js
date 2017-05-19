@@ -10,6 +10,53 @@ const supertest = require('supertest');
         type: "application/json",
     }
 
+    it("GET /drives returns array of drives", function(done) {
+        var app = require("../scripts/server.js");
+        var service = app.restService;
+        supertest(app).get("/test/drives").expect((res) => {
+            res.statusCode.should.equal(200);
+            res.headers["content-type"].should.match(/json/);
+            res.headers["content-type"].should.match(/utf-8/);
+            var drives = res.body;
+            drives.should.instanceOf(Array);
+            drives.length.should.equal(3);
+            should.deepEqual(drives[0], {
+                gearIn: 1,
+                gearOut: 1,
+                maxPos: 100,
+                microsteps: 16,
+                minPos: 0,
+                mstepPulses: 1,
+                pitch: 2,
+                steps: 200,
+                teeth: 16,
+                type: "BeltDrive",
+            });
+            should.deepEqual(drives[1], {
+                gearIn: 1,
+                gearOut: 1,
+                maxPos: 100,
+                microsteps: 16,
+                minPos: 0,
+                mstepPulses: 1,
+                pitch: 2,
+                steps: 200,
+                teeth: 16,
+                type: "BeltDrive",
+            });
+            should.deepEqual(drives[2], {
+                gearIn: 1,
+                gearOut: 1,
+                lead: 0.8,
+                maxPos: 10,
+                microsteps: 16,
+                minPos: 0,
+                mstepPulses: 1,
+                steps: 200,
+                type: "ScrewDrive",
+            });
+        }).end((err,res) => {if (err) throw err; else done(); });
+    });
     it("GET /state returns DriveFrame state", function(done) {
         var app = require("../scripts/server.js");
         var service = app.restService;
