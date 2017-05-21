@@ -10,14 +10,16 @@ const supertest = require('supertest');
         type: "application/json",
     }
 
-    it("GET /drives returns array of drives", function(done) {
+    it("GET /config returns kinann configuration", function(done) {
         var app = require("../scripts/server.js");
         var service = app.restService;
-        supertest(app).get("/test/drives").expect((res) => {
+        supertest(app).get("/test/config").expect((res) => {
             res.statusCode.should.equal(200);
             res.headers["content-type"].should.match(/json/);
             res.headers["content-type"].should.match(/utf-8/);
-            var drives = res.body;
+            var config  = res.body;
+            config.should.properties(["drives"]);
+            var drives = config.drives;
             drives.should.instanceOf(Array);
             drives.length.should.equal(3);
             should.deepEqual(drives[0], {

@@ -26,7 +26,7 @@
 <script>
 
 import RestBundle from "rest-bundle/vue";
-import axios from 'axios';
+import Vue from "vue";
 
 export default {
     mixins: [ RestBundle.RbService ],
@@ -34,10 +34,15 @@ export default {
         model: {
             required: false,
             type: String,
-            default: "kinann",
+            default: "position",
         }
     },
     data: function() {
+        this.restBundleModel({
+            motor: [],
+            axis: [],
+            world: [],
+        });
         return {
             showDetail: false, 
             posDisplay: ["Axis","Stepper","World"],
@@ -49,20 +54,47 @@ export default {
         }
     },
     created( ){
-        axios.get(this.origin + "/" +this.service+ "/position", {
-        })
-        .then(res => {
-            this.commit({ position: res.data });
-        })
-        .catch(err => {
-        });
+        //this.$http.get(this.origin() + "/" +this.service+ "/position", {
+        //})
+        //.then(res => {
+            //this.restBundleCommit({ position: res.data });
+        //})
+        //.catch(err => {
+        //});
     },
     computed: {
+        rbModel() {
+            return this.restBundleModel();
+        },
         position() {
-            return this.modelState && this.modelState.position || "position?";
+            return this.rbModel;
         },
     },
     methods: {
+        restBundleModel(state) {
+            var rbService = this.restBundleService();
+            if (rbService[this.model] == null) {
+                var that = this;
+                function getUpdate(state) {
+                    var url = [that.origin(), that.service, that.model].join("/");
+                    that.$http.get(url).then((res) => {
+                        var data = res.data;
+                        data && Object.keys(data).forEach(key => Vue.set(state, key, data[key]));
+                    }).catch( err => {
+                        that.setError(err);
+                    });
+                };
+                this.$store.registerModule(["restBundle", this.service, this.model], {
+                    namespaced: true,
+                    state: state || {},
+                    mutations: {
+                        getUpdate,
+                    },
+                });
+                this.restBundleCommit("getUpdate");
+            }
+            return rbService[this.model];
+        },
     }
 }
 

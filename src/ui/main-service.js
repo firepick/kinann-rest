@@ -1,11 +1,14 @@
 import Vue from 'vue';
 import Vuex from 'vuex';
 import Vuetify from 'vuetify';
-import RestBundle from "rest-bundle/vue";
-import Service from './Service.vue';
+import axios from 'axios';
+import VueAxios from 'vue-axios';
+import RestBundle from 'rest-bundle/vue';
+import Dev from './Dev.vue';
 require('./stylus/main.styl')
 
-Vue.use(Vuex);
+Vue.use(VueAxios, axios);
+Vue.use(Vuex);;
 Vue.use(Vuetify);
 Vue.use(RestBundle);
 
