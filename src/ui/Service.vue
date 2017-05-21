@@ -24,9 +24,6 @@
         <v-card hover v-tooltip:bottom='{html:"<kr-config/>"}'>
             <kr-config class="mb-3" :service="serviceName"/>
         </v-card>
-
-        <h6>Lorem Ipsum</h6>
-        Lore ipsum dolor sit atmet
     </v-card-text>
     <v-card-text v-show="mode==='operate'">
         <h6 >Position</h6>
