@@ -81,8 +81,8 @@ import KrPosition from './KrPosition.vue';
 import KrConfig from './KrConfig.vue';
 import KrBeltDrive from './KrBeltDrive.vue';
 import KrScrewDrive from './KrScrewDrive.vue';
-import RestBundle from "rest-bundle/vue";
-import KinannRest from "../../vue";
+import rbvue from "rest-bundle/vue";
+import krvue from "../../vue";
 
 export default {
     name: 'dev',
@@ -103,8 +103,8 @@ export default {
                 title: "Service Home Page",
                 href: "/service",
             }],
-            sidebarRestBundle: RestBundle.methods.aboutSidebar(RestBundle.components),
-            sidebarKinannRest: RestBundle.methods.aboutSidebar(KinannRest.components),
+            sidebarRestBundle: rbvue.methods.aboutSidebar(rbvue.components),
+            sidebarKinannRest: rbvue.methods.aboutSidebar(krvue.components),
         }
     },
     methods: {

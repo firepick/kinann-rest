@@ -37,12 +37,12 @@
 
 import KrBeltDrive from "./KrBeltDrive.vue";
 import KrScrewDrive from "./KrScrewDrive.vue";
-import RestBundle from "rest-bundle/vue";
+import rbvue from "rest-bundle/vue";
 
 export default {
     mixins: [ 
-        RestBundle.mixins.RbAboutMixin, 
-        RestBundle.mixins.RbServiceMixin,
+        rbvue.mixins.RbAboutMixin, 
+        rbvue.mixins.RbServiceMixin,
     ],
     props: {
         model: {

@@ -1,5 +1,6 @@
-const RestBundle = require("../src/rest-bundle");
-const ResourceMethod = RestBundle.ResourceMethod;
+const rest_bundle = require("rest-bundle");
+const RestBundle = rest_bundle.RestBundle;
+const ResourceMethod = rest_bundle.ResourceMethod;
 
 (function(exports) {
 

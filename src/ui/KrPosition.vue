@@ -29,13 +29,13 @@
 </template>
 <script>
 
-import RestBundle from "rest-bundle/vue";
+import rbvue from "rest-bundle/vue";
 import Vue from "vue";
 
 export default {
     mixins: [ 
-        RestBundle.mixins.RbAboutMixin, 
-        RestBundle.mixins.RbServiceMixin,
+        rbvue.mixins.RbAboutMixin, 
+        rbvue.mixins.RbServiceMixin,
     ],
     methods: {
         positionStr(basis) {

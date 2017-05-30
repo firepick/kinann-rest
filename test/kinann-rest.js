@@ -33,6 +33,7 @@ const supertest = require('supertest');
                 steps: 200,
                 teeth: 16,
                 type: "BeltDrive",
+                name: "X",
             });
             should.deepEqual(drives[1], {
                 gearIn: 1,
@@ -45,6 +46,7 @@ const supertest = require('supertest');
                 steps: 200,
                 teeth: 16,
                 type: "BeltDrive",
+                name: "Y",
             });
             should.deepEqual(drives[2], {
                 gearIn: 1,
@@ -56,6 +58,7 @@ const supertest = require('supertest');
                 mstepPulses: 1,
                 steps: 200,
                 type: "ScrewDrive",
+                name: "Z",
             });
         }).end((err,res) => {if (err) throw err; else done(); });
     });

@@ -40,7 +40,7 @@
 </template>
 <script>
 
-import RestBundle from "rest-bundle/vue.js";
+import rbvue from "rest-bundle/vue.js";
 
 function defaultDrive() {
     console.log("defaultDrive");
@@ -58,7 +58,7 @@ function defaultDrive() {
 }
 
 export default {
-    mixins: [ RestBundle.mixins.RbAboutMixin ],
+    mixins: [ rbvue.mixins.RbAboutMixin ],
     props: {
         drive: {
             default: defaultDrive,
