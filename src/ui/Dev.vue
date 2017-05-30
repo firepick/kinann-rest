@@ -1,47 +1,110 @@
 <template>
 
-
 <v-app id="dev-app" >
-    <v-tabs grow>
-        <v-card class="primary">
-            <v-card-title>
-                <span class="light-blue--text">{{package.name}} {{package.version}} </span>
-                <v-spacer></v-spacer>
-                <span class="light-blue--text">development application</span>
-            </v-card-title>
-        </v-card>
-        <v-tab-item href="#app-tab-1" slot="activators"> Introduction.vue </v-tab-item>
-        <v-tab-item href="#app-tab-2" slot="activators"> AllServices.vue </v-tab-item>
-        <v-tab-item href="#app-tab-3" slot="activators"> Service.vue </v-tab-item>
-        <v-tab-content id="app-tab-1" slot="content" ><v-card> <v-card-text>
-            <introduction ></introduction>
-            </v-card-text></v-card></v-tab-content> 
-        <v-tab-content id="app-tab-2" slot="content" ><v-card> <v-card-text>
-            <all-services ></all-services>
-            </v-card-text> </v-card> 
-        </v-tab-content> 
-        <v-tab-content id="app-tab-3" slot="content" >
-            <v-card> <v-card-text>
-                <v-card-row><v-spacer/><a target='_blank'  :href='productionUrl("/test/ui")' >  
-                    Service Home Page (production)</a>
-                    </v-card-row>
-            <service ></service>
-            </v-card-text> </v-card> 
-        </v-tab-content> 
-    </v-tabs>
+   <v-navigation-drawer persistent light v-model="drawer" light>
+      <v-list dense>
+        <v-list-item v-for="item in sidebarMain" :key="item">
+          <v-list-tile exact router :href="item.href">
+            <v-list-tile-action>
+                <v-icon >{{item.icon}}</v-icon>
+            </v-list-tile-action>
+            <v-list-tile-content>
+                <v-list-tile-title>{{ item.title }}</v-list-tile-title>
+            </v-list-tile-content>
+            <v-list-tile-action>
+                <v-icon v-show='$route.path === item.href'>keyboard_arrow_right</v-icon>
+            </v-list-tile-action>
+          </v-list-tile>
+        </v-list-item>
+        <v-list-group value="sidebarRestBundle">
+            <v-list-tile slot="item">
+              <v-list-tile-action> <v-icon dark>info</v-icon> </v-list-tile-action>
+              <v-list-tile-content>
+                <v-list-tile-title>RestBundle Components</v-list-tile-title>
+              </v-list-tile-content>
+              <v-list-tile-action>
+                <v-icon dark>keyboard_arrow_down</v-icon>
+              </v-list-tile-action>
+            </v-list-tile>
+            <v-list-item v-for="item in sidebarRestBundle" :key="item">
+              <v-list-tile exact router :href="item.href">
+                <v-list-tile-content>
+                    <v-list-tile-title>{{ item.title }}</v-list-tile-title>
+                </v-list-tile-content>
+                <v-list-tile-action>
+                    <v-icon v-show='$route.path === item.href'>keyboard_arrow_right</v-icon>
+                </v-list-tile-action>
+              </v-list-tile>
+            </v-list-item>
+        </v-list-group>
+        <v-list-group value="sidebarKinannRest">
+            <v-list-tile slot="item">
+              <v-list-tile-action> <v-icon dark>info</v-icon> </v-list-tile-action>
+              <v-list-tile-content>
+                <v-list-tile-title>KinannRest Components</v-list-tile-title>
+              </v-list-tile-content>
+              <v-list-tile-action>
+                <v-icon dark>keyboard_arrow_down</v-icon>
+              </v-list-tile-action>
+            </v-list-tile>
+            <v-list-item v-for="item in sidebarKinannRest" :key="item">
+              <v-list-tile exact router :href="item.href">
+                <v-list-tile-content>
+                    <v-list-tile-title>{{ item.title }}</v-list-tile-title>
+                </v-list-tile-content>
+                <v-list-tile-action>
+                    <v-icon v-show='$route.path === item.href'>keyboard_arrow_right</v-icon>
+                </v-list-tile-action>
+              </v-list-tile>
+            </v-list-item>
+        </v-list-group>
+      </v-list>
+    </v-navigation-drawer>
+    <v-toolbar fixed class="black" >
+        <v-toolbar-side-icon light @click.native.stop="drawer = !drawer"></v-toolbar-side-icon>
+        <v-toolbar-title class="grey--text text--lighten-1">{{package.name}} {{package.version}}</v-toolbar-title>
+        <v-toolbar-title class="purple--text hidden-xs-only"
+            style="position:absolute; right:0; ">dev app</v-toolbar-title>
+    </v-toolbar>
+    <main>
+        <v-container fluid> <router-view/> </v-container>
+    </main>
 </v-app>
 
-</template> <!-- ====================================== --> <script>
+</template> 
+<script>
 
 import Introduction from './Introduction.vue';
 import AllServices from './AllServices.vue';
 import Service from './Service.vue';
+import KrPosition from './KrPosition.vue';
+import KrConfig from './KrConfig.vue';
+import KrBeltDrive from './KrBeltDrive.vue';
+import KrScrewDrive from './KrScrewDrive.vue';
+import RestBundle from "rest-bundle/vue";
+import KinannRest from "../../vue";
 
 export default {
     name: 'dev',
     data() {
         return {
             package: require("../../package.json"),
+            drawer: false,
+            sidebarMain: [{
+                icon: "info",
+                title: "Introduction",
+                href: "/introduction",
+            },{
+                icon: "web",
+                title: "All Services",
+                href: "/all-services",
+            },{
+                icon: "web_asset",
+                title: "Service Home Page",
+                href: "/service",
+            }],
+            sidebarRestBundle: RestBundle.methods.aboutSidebar(RestBundle.components),
+            sidebarKinannRest: RestBundle.methods.aboutSidebar(KinannRest.components),
         }
     },
     methods: {
@@ -56,9 +119,12 @@ export default {
         Introduction,
         AllServices,
         Service,
+        KrPosition,
+        KrConfig,
+        KrBeltDrive,
+        KrScrewDrive,
     },
 }
 
-</script><!-- ====================================== --> <style>
-
-</style>
+</script>
+<style> </style>

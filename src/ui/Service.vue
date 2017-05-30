@@ -5,7 +5,7 @@
         <v-card-title>
             <span class="" >Service Home Page</span>
             <v-spacer></v-spacer>
-            <span  class="">/{{serviceName}}</span>
+            <span  class="">/{{serviceFromUrl}}</span>
         </v-card-title>
     </v-card-row>
     <v-card-text v-show="mode==='connect'">
@@ -16,19 +16,19 @@
             v-bind:disabled="loading"
             >Verify Connections</v-btn>
         <v-card hover v-tooltip:bottom='{html:"<rb-identity/>"}' >
-            <rb-identity class="mb-3" :service="serviceName"/>
+            <rb-identity class="mb-3" :service="serviceFromUrl"/>
         </v-card>
     </v-card-text>
     <v-card-text v-show="mode==='configure'">
         <h6>Configuration</h6>
         <v-card hover v-tooltip:bottom='{html:"<kr-config/>"}'>
-            <kr-config class="mb-3" :service="serviceName"/>
+            <kr-config class="mb-3" :service="serviceFromUrl"/>
         </v-card>
     </v-card-text>
     <v-card-text v-show="mode==='operate'">
         <h6 >Position</h6>
         <v-card hover v-tooltip:bottom='{html:"<kr-position/>"}' >
-            <kr-position :service="serviceName"/>
+            <kr-position :service="serviceFromUrl"/>
         </v-card>
     </v-card-text>
     <div style="position:relative">
@@ -55,7 +55,6 @@
 
 import KrPosition from './KrPosition.vue';
 import KrConfig  from './KrConfig.vue';
-import RestBundle from 'rest-bundle/vue.js';
 
 export default {
     name: "service",
@@ -69,8 +68,9 @@ export default {
         location() {
             return location; 
         },
-        serviceName() {
-            return this.$store.state.serviceName || "test";
+        serviceFromUrl() {
+            var subpaths = location.href.split("/");
+            return subpaths[3] || "test";
         },
         restBundles() {
             return this.$store.getters.restBundles;
@@ -78,8 +78,10 @@ export default {
     },
     methods: {
         update() {
-            var RbIdentity = RestBundle.RbIdentity;
-            RbIdentity.update();
+            this.loading = true;
+            this.$store.dispatch(["restBundle", this.serviceFromUrl, "identity", "getUpdate"].join("/"))
+                .then(res => (loading = false))
+                .catch(err => (loading = false));
         },
     },
     mounted() {
