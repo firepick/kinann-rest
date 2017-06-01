@@ -62,15 +62,23 @@ const supertest = require('supertest');
             });
         }).end((err,res) => {if (err) throw err; else done(); });
     });
-    it("GET /state returns DriveFrame state", function(done) {
+    it("TESTTESTGET /state returns DriveFrame state", function(done) {
         var app = require("../scripts/server.js");
         var service = app.restService;
         supertest(app).get("/test/state").expect((res) => {
             res.statusCode.should.equal(200);
             res.headers["content-type"].should.match(/json/);
             res.headers["content-type"].should.match(/utf-8/);
-            should.deepEqual(res.body, service.df.state);
-            // drive frame state
+            var state = res.body;
+            state.should.properties({
+                position: {
+                    motor: [0,0,0],
+                    axis: [0,0,0],
+                },
+            });
+            var now = Date.now();
+            Math.abs(state.now-now).should.below(100);
+            should.deepEqual(state.driveFrameState, service.df.state);
             service.df.state.should.instanceOf(Array); 
             service.df.state.length.should.equal(6);
         }).end((err,res) => {if (err) throw err; else done(); });

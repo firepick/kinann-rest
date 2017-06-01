@@ -83,7 +83,11 @@ var rb = require("rest-bundle");
         }
 
         getState(req, res, next) {
-            return this.df.state;
+            return {
+                now: Date.now(),
+                position: this.positionResponse(),
+                driveFrameState: this.df.state,
+            }
         }
 
     } //// class KinannRest

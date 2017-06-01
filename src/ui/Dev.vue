@@ -63,7 +63,7 @@
     <v-toolbar fixed class="black" >
         <v-toolbar-side-icon light @click.native.stop="drawer = !drawer"></v-toolbar-side-icon>
         <v-toolbar-title class="grey--text text--lighten-1">{{package.name}} {{package.version}}</v-toolbar-title>
-        <v-toolbar-title class="purple--text hidden-xs-only"
+        <v-toolbar-title class="secondary--text hidden-xs-only"
             style="position:absolute; right:0; ">dev app</v-toolbar-title>
     </v-toolbar>
     <main>
