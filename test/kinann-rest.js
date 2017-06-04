@@ -34,6 +34,7 @@ const supertest = require('supertest');
                 teeth: 16,
                 type: "BeltDrive",
                 name: "X",
+                isHomed: true,
             });
             should.deepEqual(drives[1], {
                 gearIn: 1,
@@ -47,6 +48,7 @@ const supertest = require('supertest');
                 teeth: 16,
                 type: "BeltDrive",
                 name: "Y",
+                isHomed: true,
             });
             should.deepEqual(drives[2], {
                 gearIn: 1,
@@ -59,12 +61,14 @@ const supertest = require('supertest');
                 steps: 200,
                 type: "ScrewDrive",
                 name: "Z",
+                isHomed: true,
             });
         }).end((err,res) => {if (err) throw err; else done(); });
     });
-    it("TESTTESTGET /state returns DriveFrame state", function(done) {
+    it("GET /state returns DriveFrame state", function(done) {
         var app = require("../scripts/server.js");
         var service = app.restService;
+        service.df.home(); // initialize for testing
         supertest(app).get("/test/state").expect((res) => {
             res.statusCode.should.equal(200);
             res.headers["content-type"].should.match(/json/);
@@ -76,8 +80,6 @@ const supertest = require('supertest');
                     axis: [0,0,0],
                 },
             });
-            var now = Date.now();
-            Math.abs(state.now-now).should.below(100);
             should.deepEqual(state.driveFrameState, service.df.state);
             service.df.state.should.instanceOf(Array); 
             service.df.state.length.should.equal(6);
@@ -86,6 +88,7 @@ const supertest = require('supertest');
     it("GET /position returns DriveFrame position", function(done) {
         var app = require("../scripts/server.js");
         var service = app.restService;
+        service.df.home(); // initialize for testing
         supertest(app).get("/test/position").expect((res) => {
             res.statusCode.should.equal(200);
             res.headers["content-type"].should.match(/json/);
@@ -96,19 +99,21 @@ const supertest = require('supertest');
             });
         }).end((err,res) => {if (err) throw err; else done(); });
     });
-    it("POST /position sets DriveFrame position in axis coordinates", function(done) {
+    it("TESTPOST /home homes DriveFrame", function(done) {
         var app = require("../scripts/server.js");
         var service = app.restService;
-        var axis123 = {
-            axis: [1,2,3],
-        }
-        supertest(app).post("/test/position").send(axis123).expect((res) => {
+        service.df.clearPos();
+        should.deepEqual(service.df.axisPos, [null,null,null]);
+        service.df.home({axis:0});
+        should.deepEqual(service.df.axisPos, [0,null,null]);
+        supertest(app).post("/test/home").send({axis:0}).expect((res) => {
             res.statusCode.should.equal(200);
             res.headers["content-type"].should.match(/json/);
             res.headers["content-type"].should.match(/utf-8/);
+            should.deepEqual(service.df.axisPos, [0, null, null]);
             should.deepEqual(res.body, {
-                motor: [100,200,7680],
-                axis: [1,2,3],
+                motor: [0,null,null],
+                axis: [0,null,null],
             });
         }).end((err,res) => {if (err) throw err; else done(); });
     })

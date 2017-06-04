@@ -20,5 +20,8 @@
     top:0.35em;
     left:0.5em;
 }
+.input-group label {
+   font-size: 14px !important;
+}
 
 

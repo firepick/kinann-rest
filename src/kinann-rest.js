@@ -16,9 +16,9 @@ var rb = require("rest-bundle");
             Object.defineProperty(this, "handlers", {
                 value: super.handlers.concat([
                     this.resourceMethod("get", "config", this.getConfig),
-                    this.resourceMethod("get", "state", this.getState),
                     this.resourceMethod("get", "position", this.getPosition),
-                    this.resourceMethod("post", "position", this.setPosition),
+                    this.resourceMethod("post", "position", this.postPosition),
+                    this.resourceMethod("post", "home", this.postHome),
                 ]),
             });
             this.drives = options.drives || [
@@ -62,7 +62,7 @@ var rb = require("rest-bundle");
             return this.positionResponse();
         }
 
-        setPosition(req, res, next) {
+        postPosition(req, res, next) {
             var position = req.body;
             if (position.axis) { // priority #1
                 this.df.axisPos = position.axis;
@@ -76,6 +76,15 @@ var rb = require("rest-bundle");
             return this.positionResponse();
         }
 
+        postHome(req, res, next) {
+            var options = req.body;
+            console.log("postHome", options, options.axis);
+            console.log("axisPos", this.df.axisPos);
+            this.df.home(options);
+            console.log("axisPos", this.df.axisPos);
+            return this.positionResponse();
+        }
+
         getConfig(req, res, next) {
             return {
                 drives: this.drives,
@@ -83,11 +92,12 @@ var rb = require("rest-bundle");
         }
 
         getState(req, res, next) {
-            return {
-                now: Date.now(),
+            var superState = super.getState();
+            var result =  Object.assign(superState, {
                 position: this.positionResponse(),
                 driveFrameState: this.df.state,
-            }
+            });
+            return result;
         }
 
     } //// class KinannRest
