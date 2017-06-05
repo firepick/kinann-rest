@@ -106,7 +106,7 @@ export default {
         positionAxis(axis, pos) {
             console.log("positionAxis", axis, pos);
             if (pos === 0) {
-                var url = this.origin() + "/" + this.service + "/home";
+                var url = this.restOrigin + "/" + this.service + "/home";
                 this.$http.post(url, {axis:axis}, {
                     headers: {}
                 })
@@ -132,6 +132,9 @@ export default {
     },
     created() {
         this.restBundleDispatch("getUpdate");
+    },
+    mounted() {
+        console.log("mounted");
     },
 }
 

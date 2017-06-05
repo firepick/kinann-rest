@@ -78,10 +78,8 @@ var rb = require("rest-bundle");
 
         postHome(req, res, next) {
             var options = req.body;
-            console.log("postHome", options, options.axis);
-            console.log("axisPos", this.df.axisPos);
             this.df.home(options);
-            console.log("axisPos", this.df.axisPos);
+            this.pushState();
             return this.positionResponse();
         }
 

@@ -1,7 +1,7 @@
 <template>
 
 <v-card >
-    <v-card-row class="secondary" >
+    <v-card-row class="primary white--text" >
         <v-card-title>
             <span class="" >Service Home Page</span>
             <v-spacer></v-spacer>
@@ -53,11 +53,13 @@
 
 </template><script>
 
+import rbvue from "rest-bundle/vue.js";
 import KrPosition from './KrPosition.vue';
 import KrConfig  from './KrConfig.vue';
 
 export default {
     name: "service",
+    mixins: [ rbvue.mixins.RbServiceMixin ],
     data: function() {
         return {
             loading: false,
@@ -65,13 +67,6 @@ export default {
         }
     }, 
     computed: {
-        location() {
-            return location; 
-        },
-        serviceFromUrl() {
-            var subpaths = location.href.split("/");
-            return subpaths[3] || "test";
-        },
         restBundles() {
             return this.$store.getters.restBundles;
         },
@@ -92,10 +87,5 @@ export default {
     },
 }
 
-</script><style>
-
-.secondary--text {
-    color: white;
-}
-
-</style>
+</script>
+<style> </style>

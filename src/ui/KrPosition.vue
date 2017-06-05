@@ -21,32 +21,32 @@
         <rb-about-item name="service" value="test" slot="prop">RestBundle name</rb-about-item>
     </rb-about>
     <v-layout class="grey lighten-3 grey--text">
-          <v-menu top left class="mr-2">
-            <v-btn icon="icon" slot="activator" dark>
-              <v-icon>menu</v-icon>
-            </v-btn>
-            <v-list>
-              <v-list-item v-for="item in posItems" :key="item">
-                <v-list-tile @click.native="item.display=!item.display">
-                    <v-list-tile-action>
-                      <v-icon v-if="item.display">check</v-icon>
-                    </v-list-tile-action>
-                    <v-list-tile-title>{{ item.text }}</v-list-tile-title>
-                </v-list-tile>
-              </v-list-item>
-            </v-list>
-          </v-menu>
-          <v-layout flex wrap justify-end>
+          <v-layout flex wrap justify-start>
               <v-chip v-for="item in posItems" :key="item.text" 
                   v-show="item.display"
                   @input="item.display=!item.display"
                   @click.native.stop
                   light
                   class="chip--select-multi pl-4 grey lighten-3"
-                  close>
+                  >
                   <template >{{item.text}}: {{positionStr(item.basis)}}</template>
               </v-chip>
           </v-layout>
+          <v-menu top right class="mr-2">
+              <v-btn icon="icon" slot="activator" dark>
+                  <v-icon>menu</v-icon>
+              </v-btn>
+              <v-list>
+                  <v-list-item v-for="item in posItems" :key="item">
+                      <v-list-tile @click.native="item.display=!item.display">
+                          <v-list-tile-action>
+                              <v-icon v-if="item.display">check</v-icon>
+                          </v-list-tile-action>
+                          <v-list-tile-title>{{ item.text }}</v-list-tile-title>
+                      </v-list-tile>
+                  </v-list-item>
+              </v-list>
+          </v-menu>
     </v-layout>
 </div>
 

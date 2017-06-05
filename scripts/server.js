@@ -35,5 +35,7 @@ if (module.parent) {
     }, {});
     var port = listener.address().port;
     winston.info('Node.js http.Server listening on port:', port);
-    var rbws = new rb.RestBundle.RbWebSocket(restBundles, listener);
+    var rbws = new rb.RestBundle.RbWebSocket(restBundles, listener, {
+        pushStateInterval: 5000, // Background pushState handles state changes that were not pushed directly
+    });
 }
