@@ -64,7 +64,7 @@ var rb = require("rest-bundle");
 
         postMoveTo(req, res, next) {
             var position = req.body;
-            return this.taskPromise("postMoveTo "+position, (resolve, reject) => {
+            return this.taskPromise("postMoveTo " + position, (resolve, reject) => {
                 this.df.moveTo(req.body)
                     .then(df => resolve(this.positionResponse()))
                     .catch(err => reject(err));
