@@ -1,8 +1,9 @@
-const should = require("should");
-const KinannRest = require("../src/kinann-rest");
-const supertest = require('supertest');
-
 (typeof describe === 'function') && describe("KinannRest", function() {
+    const should = require("should");
+    const KinannRest = require("../src/kinann-rest");
+    const supertest = require('supertest');
+    const winston = require('winston');
+    winston.level = "warn";
 
     var pkg = require("../package.json");
     var application_json_200 = {
@@ -68,7 +69,7 @@ const supertest = require('supertest');
     it("GET /state returns DriveFrame state", function(done) {
         var app = require("../scripts/server.js");
         var service = app.restService;
-        service.df.home(); // initialize for testing
+        service.df.homeSync(); // initialize for testing
         supertest(app).get("/test/state").expect((res) => {
             res.statusCode.should.equal(200);
             res.headers["content-type"].should.match(/json/);
@@ -88,7 +89,7 @@ const supertest = require('supertest');
     it("GET /position returns DriveFrame position", function(done) {
         var app = require("../scripts/server.js");
         var service = app.restService;
-        service.df.home(); // initialize for testing
+        service.df.homeSync(); // initialize for testing
         supertest(app).get("/test/position").expect((res) => {
             res.statusCode.should.equal(200);
             res.headers["content-type"].should.match(/json/);
@@ -104,7 +105,7 @@ const supertest = require('supertest');
         var service = app.restService;
         service.df.clearPos();
         should.deepEqual(service.df.axisPos, [null,null,null]);
-        service.df.home({axis:0});
+        service.df.homeSync({axis:0});
         should.deepEqual(service.df.axisPos, [0,null,null]);
         supertest(app).post("/test/home").send({axis:0}).expect((res) => {
             res.statusCode.should.equal(200);
@@ -115,15 +116,15 @@ const supertest = require('supertest');
                 motor: [0,null,null],
                 axis: [0,null,null],
             });
-        }).end((err,res) => {if (err) throw err; else done(); });
+        }).end((err,res) => {if (err) {throw err;} else done(); });
     })
-    it("POST /position sets DriveFrame position in motor coordinates", function(done) {
+    it("POST /move-to sets DriveFrame position in motor coordinates", function(done) {
         var app = require("../scripts/server.js");
         var service = app.restService;
         var motor123 = {
             motor: [100,200,7680],
         }
-        supertest(app).post("/test/position").send(motor123).expect((res) => {
+        supertest(app).post("/test/move-to").send(motor123).expect((res) => {
             res.statusCode.should.equal(200);
             res.headers["content-type"].should.match(/json/);
             res.headers["content-type"].should.match(/utf-8/);
@@ -133,14 +134,14 @@ const supertest = require('supertest');
             });
         }).end((err,res) => {if (err) throw err; else done(); });
     });
-    it("POST /position priority is: 1) axis, 2) motor", function(done) {
+    it("POST /move-to priority is: 1) axis, 2) motor", function(done) {
         var app = require("../scripts/server.js");
         var service = app.restService;
         var ambiguous123 = {
             axis: [1,2,3],
             motor: [1,2,3],
         }
-        supertest(app).post("/test/position").send(ambiguous123).expect((res) => {
+        supertest(app).post("/test/move-to").send(ambiguous123).expect((res) => {
             res.statusCode.should.equal(200);
             res.headers["content-type"].should.match(/json/);
             res.headers["content-type"].should.match(/utf-8/);
@@ -150,15 +151,15 @@ const supertest = require('supertest');
             });
         }).end((err,res) => {if (err) throw err; else done(); });
     });
-    it("POST /position requires valid position", function(done) {
+    it("TESTPOST /move-to requires valid position", function(done) {
         var app = require("../scripts/server.js");
         var service = app.restService;
-        supertest(app).post("/test/position").send({here:42}).expect((res) => {
+        supertest(app).post("/test/move-to").send({here:42}).expect((res) => {
             res.statusCode.should.equal(500);
             res.headers["content-type"].should.match(/json/);
             res.headers["content-type"].should.match(/utf-8/);
             should.deepEqual(res.body, {
-                error: 'unknown position:{"here":42}',
+                error: 'moveToSync() unknown position:{"here":42}',
             });
         }).end((err,res) => {if (err) throw err; else done(); });
     });

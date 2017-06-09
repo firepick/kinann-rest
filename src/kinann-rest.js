@@ -8,16 +8,16 @@ var rb = require("rest-bundle");
 
 (function(exports) {
     class KinannRest extends rb.RestBundle {
-        constructor(name="kinann", options = {}) {
+        constructor(name = "kinann", options = {}) {
             super(name, Object.assign({
                 srcPkg: require("../package.json"),
-            },options));
+            }, options));
 
             Object.defineProperty(this, "handlers", {
                 value: super.handlers.concat([
                     this.resourceMethod("get", "config", this.getConfig),
                     this.resourceMethod("get", "position", this.getPosition),
-                    this.resourceMethod("post", "position", this.postPosition),
+                    this.resourceMethod("post", "move-to", this.postMoveTo),
                     this.resourceMethod("post", "home", this.postHome),
                 ]),
             });
@@ -62,37 +62,20 @@ var rb = require("rest-bundle");
             return this.positionResponse();
         }
 
-        postPosition(req, res, next) {
-            return new Promise((resolve, reject) => {
-                this.taskBegin("postPosition");
-                setTimeout(() => { // simulate real-time homing with complection callback
-                    try {
-                        var position = req.body;
-                        if (position.axis) { // priority #1
-                            this.df.axisPos = position.axis;
-                        } else if (position.motor) { // priority #2
-                            this.df.axisPos = this.df.toAxisPos(position.motor);
-                        } else if (position.world) { // priority #3
-                            throw new Error("world position not implemented");
-                        } else {
-                            throw new Error("unknown position:" + JSON.stringify(position));
-                        }
-                        this.taskEnd("postPosition");
-                        resolve(this.positionResponse());
-                    } catch(err) {
-                        this.taskEnd("postPosition");
-                        reject(err);
-                    }
-                }, 1000);
+        postMoveTo(req, res, next) {
+            var position = req.body;
+            return this.taskPromise("postMoveTo "+position, (resolve, reject) => {
+                this.df.moveTo(req.body)
+                    .then(df => resolve(this.positionResponse()))
+                    .catch(err => reject(err));
             });
         }
 
         postHome(req, res, next) {
             return this.taskPromise("postHome", (resolve, reject) => {
                 this.df.home(req.body)
-                    .then(() => resolve(this.positionResponse())
-                    .catch((err) => reject(err);
-                resolve(this.positionResponse());
+                    .then(() => resolve(this.positionResponse()))
+                    .catch((err) => reject(err));
             });
         }
 
@@ -104,7 +87,7 @@ var rb = require("rest-bundle");
 
         getState(req, res, next) {
             var superState = super.getState();
-            var result =  Object.assign(superState, {
+            var result = Object.assign(superState, {
                 position: this.positionResponse(),
                 driveFrameState: this.df.state,
             });

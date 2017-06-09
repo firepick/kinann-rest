@@ -20,17 +20,28 @@ Vue.use(VueRouter);
 Vue.use(rbvue);
 Vue.use(KinannRest);
 
-var routes = [
-    { path: '/', redirect: "/introduction" },
-    { path: '/introduction', component: Introduction },
-    { path: '/all-services', component: AllServices },
-    { path: '/service', component: Service },
+var routes = [{
+        path: '/',
+        redirect: "/introduction"
+    },
+    {
+        path: '/introduction',
+        component: Introduction
+    },
+    {
+        path: '/all-services',
+        component: AllServices
+    },
+    {
+        path: '/service',
+        component: Service
+    },
 ];
 routes = routes.concat(rbvue.methods.aboutRoutes());
 routes = routes.concat(rbvue.methods.aboutRoutes(KinannRest.components));
 
 const router = new VueRouter({
-    routes 
+    routes
 })
 
 const store = new Vuex.Store({
