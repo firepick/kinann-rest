@@ -63,24 +63,37 @@ var rb = require("rest-bundle");
         }
 
         postPosition(req, res, next) {
-            var position = req.body;
-            if (position.axis) { // priority #1
-                this.df.axisPos = position.axis;
-            } else if (position.motor) { // priority #2
-                this.df.axisPos = this.df.toAxisPos(position.motor);
-            } else if (position.world) { // priority #3
-                throw new Error("world position not implemented");
-            } else {
-                throw new Error("unknown position:" + JSON.stringify(position));
-            }
-            return this.positionResponse();
+            return new Promise((resolve, reject) => {
+                this.taskBegin("postPosition");
+                setTimeout(() => { // simulate real-time homing with complection callback
+                    try {
+                        var position = req.body;
+                        if (position.axis) { // priority #1
+                            this.df.axisPos = position.axis;
+                        } else if (position.motor) { // priority #2
+                            this.df.axisPos = this.df.toAxisPos(position.motor);
+                        } else if (position.world) { // priority #3
+                            throw new Error("world position not implemented");
+                        } else {
+                            throw new Error("unknown position:" + JSON.stringify(position));
+                        }
+                        this.taskEnd("postPosition");
+                        resolve(this.positionResponse());
+                    } catch(err) {
+                        this.taskEnd("postPosition");
+                        reject(err);
+                    }
+                }, 1000);
+            });
         }
 
         postHome(req, res, next) {
-            var options = req.body;
-            this.df.home(options);
-            this.pushState();
-            return this.positionResponse();
+            return this.taskPromise("postHome", (resolve, reject) => {
+                this.df.home(req.body)
+                    .then(() => resolve(this.positionResponse())
+                    .catch((err) => reject(err);
+                resolve(this.positionResponse());
+            });
         }
 
         getConfig(req, res, next) {

@@ -32,7 +32,7 @@
                             </v-flex>
                             <v-flex xs3 class="pt-1">
                                <v-menu origin="center center" transition="v-scale-transition" bottom >
-                                  <v-btn dark default slot="activator">Move Axis</v-btn>
+                                  <v-btn dark default :disabled="rbBusy" slot="activator">Move Axis</v-btn>
                                   <v-list>
                                     <v-list-item @click="positionAxis(i,0)" >
                                       <v-list-tile> <v-list-tile-title >Home</v-list-tile-title> </v-list-tile>
