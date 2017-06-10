@@ -38,7 +38,7 @@ var rb = require("rest-bundle");
                     lead: 0.8, // m5 screw
                 }),
             ];
-            this.df = new DriveFrame(this.drives);
+            this.df = new DriveFrame(this.drives, options);
         }
 
         get kinann() {

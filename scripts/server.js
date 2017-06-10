@@ -5,6 +5,7 @@ const express = require('express');
 const app = module.exports = express();
 const rb = require("rest-bundle");
 const KinannRest = require("../src/kinann-rest");
+const MockSerial = require("kinann").MockSerial;
 const winston = require("winston");
 
 app.all('*', function(req, res, next) {
@@ -21,7 +22,10 @@ process.argv[1].match(__filename) && process.argv.forEach((val, index) => {
     (index > 1 && val[0] !== '-' && val !== "test") && services.push(val);
 });
 winston.info("creating RestBundles:", services.join(", "));
-var restBundles = services.map((name) => new KinannRest(name).bindExpress(app))
+var restBundles = services.map((name) => {
+    var serialDriver = new MockSerial({mockSerialTimeout: 1000});
+    return new KinannRest(name, { serialDriver }).bindExpress(app);
+});
 
 if (module.parent) {
     app.restService = restBundles[0];  // supertest
