@@ -16,7 +16,8 @@
     "express": "^4.13.3",
     "file-loader": "^0.11.1",
     "kinann": "^0.5.2",
-    "rest-bundle": "^0.11.54",
+    "rest-bundle": "^0.11.56",
+    "serialport": "^4.0.7",
     "style-loader": "^0.17.0",
     "stylus": "^0.54.5",
     "stylus-loader": "^3.0.1",
@@ -54,7 +55,7 @@
     "test": "npm run test:verbose",
     "test:watch": "mocha -w -R min --inline-diffs",
     "test:test": "mocha -w -R min --inline-diffs -g TEST",
-    "test:verbose": "mocha -w --inline-diffs",
+    "test:verbose": "mocha --inline-diffs",
     "z": "echo z"
   },
   "repository": {

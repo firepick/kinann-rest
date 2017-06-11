@@ -10,10 +10,17 @@
         statusCode: 200,
         type: "application/json",
     }
+    function testApp() { // initialize singleton for each test
+        var app = require("../scripts/server.js");
+        var testDriveFrame = app.restService.df;
+        testDriveFrame.serialDriver.mockSerialTimeout = 1;
+        testDriveFrame.clearPos(); // initialize
+        should.deepEqual(testDriveFrame.axisPos, [null,null,null]);
+        return app;
+    }
 
     it("GET /config returns kinann configuration", function(done) {
-        var app = require("../scripts/server.js");
-        var service = app.restService;
+        var app = testApp();
         supertest(app).get("/test/config").expect((res) => {
             res.statusCode.should.equal(200);
             res.headers["content-type"].should.match(/json/);
@@ -67,60 +74,66 @@
         }).end((err,res) => {if (err) throw err; else done(); });
     });
     it("GET /state returns DriveFrame state", function(done) {
-        var app = require("../scripts/server.js");
-        var service = app.restService;
-        service.df.homeSync(); // initialize for testing
-        supertest(app).get("/test/state").expect((res) => {
-            res.statusCode.should.equal(200);
-            res.headers["content-type"].should.match(/json/);
-            res.headers["content-type"].should.match(/utf-8/);
-            var state = res.body;
-            state.should.properties({
-                position: {
-                    motor: [0,0,0],
-                    axis: [0,0,0],
-                },
-            });
-            should.deepEqual(state.driveFrameState, service.df.state);
-            service.df.state.should.instanceOf(Array); 
-            service.df.state.length.should.equal(6);
-        }).end((err,res) => {if (err) throw err; else done(); });
+        var async = function*() {
+            var app = testApp();
+            var testDriveFrame = app.restService.df;
+            yield testDriveFrame.home().then(r => async.next(r));
+            supertest(app).get("/test/state").expect((res) => {
+                res.statusCode.should.equal(200);
+                res.headers["content-type"].should.match(/json/);
+                res.headers["content-type"].should.match(/utf-8/);
+                var state = res.body;
+                state.should.properties({
+                    position: {
+                        motor: [0,0,0],
+                        axis: [0,0,0],
+                    },
+                });
+                should.deepEqual(state.driveFrameState, testDriveFrame.state);
+                testDriveFrame.state.should.instanceOf(Array); 
+                testDriveFrame.state.length.should.equal(6);
+            }).end((err,res) => {if (err) throw err; else done(); });
+        }();
+        async.next();
     });
     it("GET /position returns DriveFrame position", function(done) {
-        var app = require("../scripts/server.js");
-        var service = app.restService;
-        service.df.homeSync(); // initialize for testing
-        supertest(app).get("/test/position").expect((res) => {
-            res.statusCode.should.equal(200);
-            res.headers["content-type"].should.match(/json/);
-            res.headers["content-type"].should.match(/utf-8/);
-            res.body.should.properties({
-                    motor: [0,0,0],
-                    axis: [0,0,0],
-            });
-        }).end((err,res) => {if (err) throw err; else done(); });
-    });
-    it("TESTPOST /home homes DriveFrame", function(done) {
-        var app = require("../scripts/server.js");
-        var service = app.restService;
-        service.df.clearPos();
-        should.deepEqual(service.df.axisPos, [null,null,null]);
-        service.df.homeSync({axis:0});
-        should.deepEqual(service.df.axisPos, [0,null,null]);
-        supertest(app).post("/test/home").send({axis:0}).expect((res) => {
-            res.statusCode.should.equal(200);
-            res.headers["content-type"].should.match(/json/);
-            res.headers["content-type"].should.match(/utf-8/);
-            should.deepEqual(service.df.axisPos, [0, null, null]);
-            should.deepEqual(res.body, {
-                motor: [0,null,null],
-                axis: [0,null,null],
-            });
-        }).end((err,res) => {if (err) {throw err;} else done(); });
+        var async = function*() {
+            var app = testApp();
+            var testDriveFrame = app.restService.df;
+            yield testDriveFrame.home().then(r => async.next(r));
+            supertest(app).get("/test/position").expect((res) => {
+                res.statusCode.should.equal(200);
+                res.headers["content-type"].should.match(/json/);
+                res.headers["content-type"].should.match(/utf-8/);
+                res.body.should.properties({
+                        motor: [0,0,0],
+                        axis: [0,0,0],
+                });
+            }).end((err,res) => {if (err) throw err; else done(); });
+        }();
+        async.next();
+    })
+    it("POST /home homes DriveFrame", function(done) {
+        var async = function*() {
+            var app = testApp();
+            var testDriveFrame = app.restService.df;
+            yield testDriveFrame.home({axis:0}).then(r => async.next(r));
+            should.deepEqual(testDriveFrame.axisPos, [0,null,null]);
+            supertest(app).post("/test/home").send({axis:0}).expect((res) => {
+                res.statusCode.should.equal(200);
+                res.headers["content-type"].should.match(/json/);
+                res.headers["content-type"].should.match(/utf-8/);
+                should.deepEqual(testDriveFrame.axisPos, [0, null, null]);
+                should.deepEqual(res.body, {
+                    motor: [0,null,null],
+                    axis: [0,null,null],
+                });
+            }).end((err,res) => {if (err) throw err; else done(); });
+        }();
+        async.next();
     })
     it("POST /move-to sets DriveFrame position in motor coordinates", function(done) {
-        var app = require("../scripts/server.js");
-        var service = app.restService;
+        var app = testApp();
         var motor123 = {
             motor: [100,200,7680],
         }
@@ -135,8 +148,7 @@
         }).end((err,res) => {if (err) throw err; else done(); });
     });
     it("POST /move-to priority is: 1) axis, 2) motor", function(done) {
-        var app = require("../scripts/server.js");
-        var service = app.restService;
+        var app = testApp();
         var ambiguous123 = {
             axis: [1,2,3],
             motor: [1,2,3],
@@ -151,16 +163,24 @@
             });
         }).end((err,res) => {if (err) throw err; else done(); });
     });
-    it("TESTPOST /move-to requires valid position", function(done) {
-        var app = require("../scripts/server.js");
-        var service = app.restService;
-        supertest(app).post("/test/move-to").send({here:42}).expect((res) => {
-            res.statusCode.should.equal(500);
-            res.headers["content-type"].should.match(/json/);
-            res.headers["content-type"].should.match(/utf-8/);
-            should.deepEqual(res.body, {
-                error: 'moveToSync() unknown position:{"here":42}',
-            });
-        }).end((err,res) => {if (err) throw err; else done(); });
+    it("POST /move-to requires valid position", function(done) {
+        var async = function*() {
+            var app = testApp();
+            supertest(app).post("/test/move-to").send({here:42}).expect((res) => {
+                res.statusCode.should.equal(500);
+                res.headers["content-type"].should.match(/json/);
+                res.headers["content-type"].should.match(/utf-8/);
+                should.deepEqual(res.body, {
+                    error: 'moveTo() unknown position:{"here":42}',
+                });
+            }).end((err,res) => {if (err) throw err; else done(); });
+        }();
+        async.next();
+    });
+    it("Serialport", function(done) {
+        var async = function*() {
+            done();
+        }();
+        async.next();
     });
 })
