@@ -3,6 +3,8 @@
     const KinannRest = require("../src/kinann-rest");
     const supertest = require('supertest');
     const winston = require('winston');
+    const serialport = require('serialport');
+    var app = require("../scripts/server.js");
     winston.level = "warn";
 
     var pkg = require("../package.json");
@@ -10,8 +12,7 @@
         statusCode: 200,
         type: "application/json",
     }
-    function testApp() { // initialize singleton for each test
-        var app = require("../scripts/server.js");
+    function testInit() { // initialize singleton for each test
         var testDriveFrame = app.restService.df;
         testDriveFrame.serialDriver.mockSerialTimeout = 1;
         testDriveFrame.clearPos(); // initialize
@@ -19,8 +20,18 @@
         return app;
     }
 
+    it("Initialize TEST suite", function(done) { // THIS TEST MUST BE FIRST
+        var async = function*() {
+            if (app.restService == null) {
+                yield app.locals.asyncOnReady.push(async);
+            }
+            winston.warn("test suite initialized");
+            done();
+        }();
+        async.next();
+    });
     it("GET /config returns kinann configuration", function(done) {
-        var app = testApp();
+        var app = testInit();
         supertest(app).get("/test/config").expect((res) => {
             res.statusCode.should.equal(200);
             res.headers["content-type"].should.match(/json/);
@@ -75,7 +86,7 @@
     });
     it("GET /state returns DriveFrame state", function(done) {
         var async = function*() {
-            var app = testApp();
+            testInit();
             var testDriveFrame = app.restService.df;
             yield testDriveFrame.home().then(r => async.next(r));
             supertest(app).get("/test/state").expect((res) => {
@@ -98,7 +109,7 @@
     });
     it("GET /position returns DriveFrame position", function(done) {
         var async = function*() {
-            var app = testApp();
+            testInit();
             var testDriveFrame = app.restService.df;
             yield testDriveFrame.home().then(r => async.next(r));
             supertest(app).get("/test/position").expect((res) => {
@@ -115,7 +126,7 @@
     })
     it("POST /home homes DriveFrame", function(done) {
         var async = function*() {
-            var app = testApp();
+            testInit();
             var testDriveFrame = app.restService.df;
             yield testDriveFrame.home({axis:0}).then(r => async.next(r));
             should.deepEqual(testDriveFrame.axisPos, [0,null,null]);
@@ -133,7 +144,7 @@
         async.next();
     })
     it("POST /move-to sets DriveFrame position in motor coordinates", function(done) {
-        var app = testApp();
+        var app = testInit();
         var motor123 = {
             motor: [100,200,7680],
         }
@@ -148,24 +159,27 @@
         }).end((err,res) => {if (err) throw err; else done(); });
     });
     it("POST /move-to priority is: 1) axis, 2) motor", function(done) {
-        var app = testApp();
-        var ambiguous123 = {
-            axis: [1,2,3],
-            motor: [1,2,3],
-        }
-        supertest(app).post("/test/move-to").send(ambiguous123).expect((res) => {
-            res.statusCode.should.equal(200);
-            res.headers["content-type"].should.match(/json/);
-            res.headers["content-type"].should.match(/utf-8/);
-            should.deepEqual(res.body, {
-                motor: [100,200,7680],
+        var async = function*() {
+            testInit();
+            var ambiguous123 = {
                 axis: [1,2,3],
-            });
-        }).end((err,res) => {if (err) throw err; else done(); });
+                motor: [1,2,3],
+            }
+            supertest(app).post("/test/move-to").send(ambiguous123).expect((res) => {
+                res.statusCode.should.equal(200);
+                res.headers["content-type"].should.match(/json/);
+                res.headers["content-type"].should.match(/utf-8/);
+                should.deepEqual(res.body, {
+                    motor: [100,200,7680],
+                    axis: [1,2,3],
+                });
+            }).end((err,res) => {if (err) throw err; else done(); });
+        }();
+        async.next();
     });
     it("POST /move-to requires valid position", function(done) {
         var async = function*() {
-            var app = testApp();
+            testInit();
             supertest(app).post("/test/move-to").send({here:42}).expect((res) => {
                 res.statusCode.should.equal(500);
                 res.headers["content-type"].should.match(/json/);
@@ -178,7 +192,51 @@
         async.next();
     });
     it("Serialport", function(done) {
+        this.timeout(10000);
         var async = function*() {
+            var ports = yield serialport.list((err, ports) => err ? async.throws(err) : async.next(ports) );
+            var ports = ports.filter(p => p.serialNumber);
+            if (ports.length) {
+                console.log("opening serial port", ports[0].comName);
+                var port = new serialport(ports[0].comName, {
+                    parser: serialport.parsers.readline('\n'),
+                    lock: false,
+                    baudRate: 19200,
+                    dataBits: 8,
+                    stopBits: 1,
+                    rtscts: false,
+                    xon: false,
+                    xoff: false,
+                    xany: false,
+                    bufferSize: 65536,
+                    autoOpen: false,
+                });
+                should.strictEqual(false, port.isOpen());
+                port.on('open', () => { console.log("opened"); });
+                port.on('close', () => { console.log("closed"); });
+                port.on('error', (err) => { console.log("error", err); });
+                port.on('data', (line) => { console.log("line", line); });
+                var result = yield port.open((err) => err ? async.throw(err) : async.next(1));
+                should.strictEqual(result, 1);
+                should.strictEqual(port.isOpen(), true);
+                var result = yield setTimeout(() => async.next(1.1), 1000);
+                should.strictEqual(result, 1.1);
+                port.flush(() => console.log("flushed input"));
+                var result = yield port.write('{"id":""}\n', (err) => err ? async.throw(err) : async.next(2)); 
+                should.strictEqual(result, 2);
+                var result = yield setTimeout(() => async.next(2.1), 200);
+                should.strictEqual(result, 2.1);
+                console.log("dim");
+                var result = yield port.write('{"sys":""}\n', (err) => err ? async.throw(err) : async.next(3)); 
+                console.log("A2");
+                should.strictEqual(result, 3);
+                var result = yield setTimeout(() =>  async.next(3.1), 500);
+                should.strictEqual(result, 3.1);
+                yield port.close((err) => { console.log("closed port"), err ? async.throw(err) : async.next(4); });
+                console.log("B");
+            } else {
+                console.log("no serial ports");
+            }
             done();
         }();
         async.next();
