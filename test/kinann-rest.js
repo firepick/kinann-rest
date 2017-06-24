@@ -3,7 +3,6 @@
     const KinannRest = require("../src/kinann-rest");
     const supertest = require('supertest');
     const winston = require('winston');
-    const serialport = require('serialport');
     var app = require("../scripts/server.js");
     winston.level = "warn";
 
@@ -25,7 +24,7 @@
             if (app.restService == null) {
                 yield app.locals.asyncOnReady.push(async);
             }
-            winston.warn("test suite initialized");
+            winston.info("test suite initialized");
             done();
         }();
         async.next();
@@ -128,17 +127,22 @@
         var async = function*() {
             testInit();
             var testDriveFrame = app.restService.df;
-            yield testDriveFrame.home({axis:0}).then(r => async.next(r));
+            yield testDriveFrame.home([true]).then(r => async.next(r));
             should.deepEqual(testDriveFrame.axisPos, [0,null,null]);
-            supertest(app).post("/test/home").send({axis:0}).expect((res) => {
-                res.statusCode.should.equal(200);
-                res.headers["content-type"].should.match(/json/);
-                res.headers["content-type"].should.match(/utf-8/);
-                should.deepEqual(testDriveFrame.axisPos, [0, null, null]);
-                should.deepEqual(res.body, {
-                    motor: [0,null,null],
-                    axis: [0,null,null],
-                });
+            supertest(app).post("/test/home").send([null,10]).expect((res) => {
+                try {
+                    res.statusCode.should.equal(200);
+                    res.headers["content-type"].should.match(/json/);
+                    res.headers["content-type"].should.match(/utf-8/);
+                    should.deepEqual(testDriveFrame.axisPos, [0, 10, null]);
+                    should.deepEqual(res.body, {
+                        motor: [0,1000,null],
+                        axis: [0,10,null],
+                    });
+                } catch (err) {
+                    winston.error(err.message);
+                    throw err;
+                }
             }).end((err,res) => {if (err) throw err; else done(); });
         }();
         async.next();
@@ -188,56 +192,6 @@
                     error: 'moveTo() unknown position:{"here":42}',
                 });
             }).end((err,res) => {if (err) throw err; else done(); });
-        }();
-        async.next();
-    });
-    it("Serialport", function(done) {
-        this.timeout(10000);
-        var async = function*() {
-            var ports = yield serialport.list((err, ports) => err ? async.throws(err) : async.next(ports) );
-            var ports = ports.filter(p => p.serialNumber);
-            if (ports.length) {
-                console.log("opening serial port", ports[0].comName);
-                var port = new serialport(ports[0].comName, {
-                    parser: serialport.parsers.readline('\n'),
-                    lock: false,
-                    baudRate: 19200,
-                    dataBits: 8,
-                    stopBits: 1,
-                    rtscts: false,
-                    xon: false,
-                    xoff: false,
-                    xany: false,
-                    bufferSize: 65536,
-                    autoOpen: false,
-                });
-                should.strictEqual(false, port.isOpen());
-                port.on('open', () => { console.log("opened"); });
-                port.on('close', () => { console.log("closed"); });
-                port.on('error', (err) => { console.log("error", err); });
-                port.on('data', (line) => { console.log("line", line); });
-                var result = yield port.open((err) => err ? async.throw(err) : async.next(1));
-                should.strictEqual(result, 1);
-                should.strictEqual(port.isOpen(), true);
-                var result = yield setTimeout(() => async.next(1.1), 1000);
-                should.strictEqual(result, 1.1);
-                port.flush(() => console.log("flushed input"));
-                var result = yield port.write('{"id":""}\n', (err) => err ? async.throw(err) : async.next(2)); 
-                should.strictEqual(result, 2);
-                var result = yield setTimeout(() => async.next(2.1), 200);
-                should.strictEqual(result, 2.1);
-                console.log("dim");
-                var result = yield port.write('{"sys":""}\n', (err) => err ? async.throw(err) : async.next(3)); 
-                console.log("A2");
-                should.strictEqual(result, 3);
-                var result = yield setTimeout(() =>  async.next(3.1), 500);
-                should.strictEqual(result, 3.1);
-                yield port.close((err) => { console.log("closed port"), err ? async.throw(err) : async.next(4); });
-                console.log("B");
-            } else {
-                console.log("no serial ports");
-            }
-            done();
         }();
         async.next();
     });

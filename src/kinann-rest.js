@@ -89,8 +89,14 @@ var rb = require("rest-bundle");
             var superState = super.getState();
             var result = Object.assign(superState, {
                 position: this.positionResponse(),
-                driveFrameState: this.df.state,
             });
+            if (this.df) {
+                var df = this.df;
+                result.driveFrameState = df.state;
+                if (df.serialDriver) {
+                    result.serialDriver = df.serialDriver.state;
+                }
+            }
             return result;
         }
 

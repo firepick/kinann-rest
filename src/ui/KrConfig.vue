@@ -107,7 +107,8 @@ export default {
             console.log("positionAxis", axis, pos);
             if (pos === 0) {
                 var url = this.restOrigin + "/" + this.service + "/home";
-                this.$http.post(url, {axis:axis}, {
+                var axes = this.config.drives.map((d,i) => i===axis ? Number(d.minPos) : null);
+                this.$http.post(url, axes, {
                     headers: {}
                 })
             }
