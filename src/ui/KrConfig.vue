@@ -38,16 +38,20 @@
                                       <v-list-tile> <v-list-tile-title >Home</v-list-tile-title> </v-list-tile>
                                     </v-list-item>
                                     <v-list-item @click="positionAxis(i,0.25)" >
-                                      <v-list-tile> <v-list-tile-title >25%</v-list-tile-title> </v-list-tile>
+                                      <v-list-tile :disabled='axisPos(i) == null'> 
+                                        <v-list-tile-title >25%</v-list-tile-title> </v-list-tile>
                                     </v-list-item>
                                     <v-list-item @click="positionAxis(i,0.50)" >
-                                      <v-list-tile> <v-list-tile-title >50%</v-list-tile-title> </v-list-tile>
+                                      <v-list-tile :disabled='axisPos(i) == null'> 
+                                        <v-list-tile-title >50%</v-list-tile-title> </v-list-tile>
                                     </v-list-item>
                                     <v-list-item @click="positionAxis(i,0.75)" >
-                                      <v-list-tile> <v-list-tile-title >75%</v-list-tile-title> </v-list-tile>
+                                      <v-list-tile :disabled='axisPos(i) == null'> 
+                                        <v-list-tile-title >75%</v-list-tile-title> </v-list-tile>
                                     </v-list-item>
                                     <v-list-item @click="positionAxis(i,1)" >
-                                      <v-list-tile> <v-list-tile-title >100%</v-list-tile-title> </v-list-tile>
+                                      <v-list-tile :disabled='axisPos(i) == null'> 
+                                        <v-list-tile-title >100%</v-list-tile-title> </v-list-tile>
                                     </v-list-item>
                                   </v-list>
                                 </v-menu>
@@ -72,6 +76,14 @@ import KrBeltDrive from "./KrBeltDrive.vue";
 import KrScrewDrive from "./KrScrewDrive.vue";
 import rbvue from "rest-bundle/vue";
 
+var positionOpts = [
+    { text: 'Home' },
+    { text: '25%' },
+    { text: '50%' },
+    { text: '75%' },
+    { text: '100%' },
+];
+
 export default {
     mixins: [ 
         rbvue.mixins.RbAboutMixin, 
@@ -93,13 +105,7 @@ export default {
             eDrive: 1,
             error:"",
             newPos:"",
-            positionOpts: [
-                { text: 'Home' },
-                { text: '25%' },
-                { text: '50%' },
-                { text: '75%' },
-                { text: '100%' },
-            ],
+            positionOpts,
         }
     },
     methods: {
@@ -108,10 +114,13 @@ export default {
             if (pos === 0) {
                 var url = this.restOrigin + "/" + this.service + "/home";
                 var axes = this.config.drives.map((d,i) => i===axis ? Number(d.minPos) : null);
-                this.$http.post(url, axes, {
-                    headers: {}
-                })
+            } else {
+                var url = this.restOrigin + "/" + this.service + "/move-to";
+                var axes = this.config.drives.map((d,i) => i===axis ? pos * (d.maxPos - d.minPos) + d.minPos : null);
             }
+            this.$http.post(url, axes, {
+                headers: {}
+            })
         },
         axisPos(iAxis) {
             var position = this.restBundleService().position;

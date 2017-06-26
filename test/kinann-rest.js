@@ -52,7 +52,7 @@
                 teeth: 16,
                 type: "BeltDrive",
                 name: "X",
-                isHomed: true,
+                isHomeable: true,
             });
             should.deepEqual(drives[1], {
                 gearIn: 1,
@@ -66,7 +66,7 @@
                 teeth: 16,
                 type: "BeltDrive",
                 name: "Y",
-                isHomed: true,
+                isHomeable: true,
             });
             should.deepEqual(drives[2], {
                 gearIn: 1,
@@ -79,7 +79,7 @@
                 steps: 200,
                 type: "ScrewDrive",
                 name: "Z",
-                isHomed: true,
+                isHomeable: true,
             });
         }).end((err,res) => {if (err) throw err; else done(); });
     });
