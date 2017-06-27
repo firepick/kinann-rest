@@ -14,10 +14,17 @@ winston.remove(winston.transports.Console);
 winston.add(winston.transports.Console, {
     timestamp: () => new Date().toLocaleTimeString([], { hour12: false, }),
     formatter: (options) => {
-        return options.timestamp() +' '+ 
-            options.level.toUpperCase() +' '+ 
-            (options.message ? options.message : '') +
-            (options.meta && Object.keys(options.meta).length ? ' '+ JSON.stringify(options.meta) : '' )
+        try {
+            var result =  options.timestamp() +' '+ 
+                options.level.toUpperCase() +' '+ 
+                (options.message ? options.message : '') +
+                (options.meta && Object.keys(options.meta).length ? ' '+ JSON.stringify(options.meta) : '') +
+                "";
+            return result;
+        } catch (err) {
+            console.log("winston died", err);
+            return err.message;
+        }
     },
 });
 
@@ -40,14 +47,17 @@ let async = function*() {
         var restBundles = [];
         for (var iService = 0; iService < services.length; iService++) {
             var serviceName = services[iService];
-            winston.debug("server.js: creating", serviceName);
+            winston.debug("server.js: creating FireStepDriver for", serviceName);
             var serialDriver = new FireStepDriver({
                 allowMock: true,
             });
-            var sp = yield serialDriver.open().then(r=>async.next(r)).catch(err=>async.throw(err));
+            winston.debug("server.js: opening FireStepDriver for", serviceName);
+            var sp = yield serialDriver.open().then(r=>async.next(r)).catch(e=>async.throw(e));
             winston.info("KinannRest", serviceName, "connected to", sp.path);
             var kr = new KinannRest(serviceName, { serialDriver });
+            winston.debug("bindExpress()...");
             kr.bindExpress(app);
+            winston.debug("bindExpress() ok");
             restBundles.push(kr);
         }
 
@@ -56,6 +66,7 @@ let async = function*() {
             app.restService = restBundles[0];  // supertest
         } else {
             var ports = [80, 8080];
+            winston.debug("launching web server...");
             var listener = ports.reduce( (listener, port) => {
                 return listener.listening && listener
                 || app.listen(port).on('error', function(error) {

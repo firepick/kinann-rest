@@ -31,27 +31,19 @@
                                 <span v-if="axisPos(i) != null">{{axisPos(i)}}</span>
                             </v-flex>
                             <v-flex xs3 class="pt-1">
-                               <v-menu origin="center center" transition="v-scale-transition" bottom >
+                               <v-menu origin="bottom center" transition="v-scale-transition" top >
                                   <v-btn dark default :disabled="rbBusy" slot="activator">Move Axis</v-btn>
                                   <v-list>
-                                    <v-list-item @click="positionAxis(i,0)" >
-                                      <v-list-tile> <v-list-tile-title >Home</v-list-tile-title> </v-list-tile>
+                                    <v-list-item v-for="pct in [0,25,50,75,100].reverse()" 
+                                        @click="positionAxis(i,pct/100)" :key="pct" >
+                                      <v-list-tile :disabled='rbBusy || axisPos(i) == null'> 
+                                        <v-list-tile-title >{{pct}}%</v-list-tile-title> 
+                                      </v-list-tile>
                                     </v-list-item>
-                                    <v-list-item @click="positionAxis(i,0.25)" >
-                                      <v-list-tile :disabled='axisPos(i) == null'> 
-                                        <v-list-tile-title >25%</v-list-tile-title> </v-list-tile>
-                                    </v-list-item>
-                                    <v-list-item @click="positionAxis(i,0.50)" >
-                                      <v-list-tile :disabled='axisPos(i) == null'> 
-                                        <v-list-tile-title >50%</v-list-tile-title> </v-list-tile>
-                                    </v-list-item>
-                                    <v-list-item @click="positionAxis(i,0.75)" >
-                                      <v-list-tile :disabled='axisPos(i) == null'> 
-                                        <v-list-tile-title >75%</v-list-tile-title> </v-list-tile>
-                                    </v-list-item>
-                                    <v-list-item @click="positionAxis(i,1)" >
-                                      <v-list-tile :disabled='axisPos(i) == null'> 
-                                        <v-list-tile-title >100%</v-list-tile-title> </v-list-tile>
+                                    <v-list-item @click="positionAxis(i,'home')" >
+                                      <v-list-tile :disabled="rbBusy" > 
+                                        <v-list-tile-title >Home</v-list-tile-title> 
+                                      </v-list-tile>
                                     </v-list-item>
                                   </v-list>
                                 </v-menu>
@@ -109,14 +101,14 @@ export default {
         }
     },
     methods: {
-        positionAxis(axis, pos) {
-            console.log("positionAxis", axis, pos);
-            if (pos === 0) {
+        positionAxis(axis, goal) {
+            console.log("positionAxis", axis, goal);
+            if (goal === "home") {
                 var url = this.restOrigin + "/" + this.service + "/home";
                 var axes = this.config.drives.map((d,i) => i===axis ? Number(d.minPos) : null);
             } else {
                 var url = this.restOrigin + "/" + this.service + "/move-to";
-                var axes = this.config.drives.map((d,i) => i===axis ? pos * (d.maxPos - d.minPos) + d.minPos : null);
+                var axes = this.config.drives.map((d,i) => i===axis ? goal * (d.maxPos - d.minPos) + d.minPos : null);
             }
             this.$http.post(url, axes, {
                 headers: {}
