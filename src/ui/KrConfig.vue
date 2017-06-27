@@ -33,7 +33,7 @@
                             <v-flex xs3 class="pt-1">
                                <v-menu origin="bottom center" transition="v-scale-transition" top >
                                   <v-btn dark default :disabled="rbBusy" slot="activator">Move Axis</v-btn>
-                                  <v-list>
+                                  <v-list dense>
                                     <v-list-item v-for="pct in [0,25,50,75,100].reverse()" 
                                         @click="positionAxis(i,pct/100)" :key="pct" >
                                       <v-list-tile :disabled='rbBusy || axisPos(i) == null'> 
