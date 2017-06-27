@@ -9,7 +9,7 @@ const MockSerial = require("kinann").serial.MockSerial;
 const MockFireStep = require("kinann").serial.MockFireStep;
 const FireStepDriver = require("kinann").serial.FireStepDriver;
 const winston = require("winston");
-winston.level = "info";
+winston.level = "debug";
 winston.remove(winston.transports.Console);
 winston.add(winston.transports.Console, {
     timestamp: () => new Date().toLocaleTimeString([], { hour12: false, }),
