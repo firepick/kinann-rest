@@ -69,6 +69,7 @@
     <main>
         <v-container fluid> <router-view/> </v-container>
     </main>
+    <rb-web-socket/>
 </v-app>
 
 </template> 

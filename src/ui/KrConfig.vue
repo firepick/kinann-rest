@@ -133,7 +133,7 @@ export default {
         KrScrewDrive,
     },
     created() {
-        this.restBundleDispatch("getUpdate");
+        this.restBundleDispatch("loadComponentModel");
     },
     mounted() {
         console.log("mounted");

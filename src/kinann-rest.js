@@ -85,7 +85,7 @@ var rb = require("rest-bundle");
             };
         }
 
-        getState(req, res, next) {
+        getState() {
             var superState = super.getState();
             var result = Object.assign(superState, {
                 position: this.positionResponse(),

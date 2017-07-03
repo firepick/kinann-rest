@@ -100,7 +100,7 @@ export default {
         }
     },
     created( ){
-        this.restBundleDispatch("getUpdate");
+        this.restBundleDispatch("loadComponentModel");
     },
     computed: {
         position() {

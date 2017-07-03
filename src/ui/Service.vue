@@ -74,7 +74,7 @@ export default {
     methods: {
         update() {
             this.loading = true;
-            this.$store.dispatch(["restBundle", this.serviceFromUrl, "identity", "getUpdate"].join("/"))
+            this.$store.dispatch(["restBundle", this.serviceFromUrl, "identity", "loadComponentModel"].join("/"))
                 .then(res => (loading = false))
                 .catch(err => (loading = false));
         },
