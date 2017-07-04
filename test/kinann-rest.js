@@ -11,8 +11,11 @@
         statusCode: 200,
         type: "application/json",
     }
+    function krTest(app) {
+        return app.locals.restBundles.filter(rb => rb.name==='test')[0];
+    }
     function testInit() { // initialize singleton for each test
-        var testDriveFrame = app.restService.df;
+        var testDriveFrame = krTest(app).df;
         testDriveFrame.serialDriver.mockSerialTimeout = 1;
         testDriveFrame.clearPos(); // initialize
         should.deepEqual(testDriveFrame.axisPos, [null,null,null]);
@@ -21,7 +24,7 @@
 
     it("Initialize TEST suite", function(done) { // THIS TEST MUST BE FIRST
         var async = function*() {
-            if (app.restService == null) {
+            if (krTest(app) == null) {
                 yield app.locals.asyncOnReady.push(async);
             }
             winston.info("test suite initialized");
@@ -86,7 +89,7 @@
     it("GET /state returns DriveFrame state", function(done) {
         var async = function*() {
             testInit();
-            var testDriveFrame = app.restService.df;
+            var testDriveFrame = krTest(app).df;
             yield testDriveFrame.home().then(r => async.next(r));
             supertest(app).get("/test/state").expect((res) => {
                 res.statusCode.should.equal(200);
@@ -109,7 +112,7 @@
     it("GET /position returns DriveFrame position", function(done) {
         var async = function*() {
             testInit();
-            var testDriveFrame = app.restService.df;
+            var testDriveFrame = krTest(app).df;
             yield testDriveFrame.home().then(r => async.next(r));
             supertest(app).get("/test/position").expect((res) => {
                 res.statusCode.should.equal(200);
@@ -126,7 +129,7 @@
     it("POST /home homes DriveFrame", function(done) {
         var async = function*() {
             testInit();
-            var testDriveFrame = app.restService.df;
+            var testDriveFrame = krTest(app).df;
             yield testDriveFrame.home([true]).then(r => async.next(r));
             should.deepEqual(testDriveFrame.axisPos, [0,null,null]);
             supertest(app).post("/test/home").send([null,10]).expect((res) => {
@@ -194,5 +197,9 @@
             }).end((err,res) => {if (err) throw err; else done(); });
         }();
         async.next();
+    });
+    it("finalize TEST suite", function() {
+        app.locals.rbServer.close();
+        winston.info("end test suite");
     });
 })

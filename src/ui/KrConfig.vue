@@ -104,10 +104,10 @@ export default {
         positionAxis(axis, goal) {
             console.log("positionAxis", axis, goal);
             if (goal === "home") {
-                var url = this.restOrigin + "/" + this.service + "/home";
+                var url = this.restOrigin() + "/" + this.service + "/home";
                 var axes = this.config.drives.map((d,i) => i===axis ? Number(d.minPos) : null);
             } else {
-                var url = this.restOrigin + "/" + this.service + "/move-to";
+                var url = this.restOrigin() + "/" + this.service + "/move-to";
                 var axes = this.config.drives.map((d,i) => i===axis ? goal * (d.maxPos - d.minPos) + d.minPos : null);
             }
             this.$http.post(url, axes, {
