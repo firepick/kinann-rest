@@ -13,6 +13,7 @@ const winston = require("winston");
 
 // ensure argv is actually for script instead of mocha
 var argv = process.argv[1].match(__filename) && process.argv || [];
+argv.filter(a => a==='--log-debug').length && (winston.level = 'debug');
 
 // set up application
 app.all('*', function(req, res, next) {
@@ -28,7 +29,7 @@ let async = function*() {
     try {
         // define RestBundles
         var restBundles = app.locals.restBundles = [];
-        var services = argv.filter((a, i) => i>1 && a[0]!=='-' && a!=="test").concat("test");
+        var services = ['test'].concat(argv.filter((a, i) => i>1 && a[0]!=='-' && a!=="test"));
         for (var iService = 0; iService < services.length; iService++) {
             var serviceName = services[iService];
             var serialDriver = new FireStepDriver({ allowMock: true, });
