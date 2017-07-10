@@ -37,14 +37,13 @@
                   <v-icon>menu</v-icon>
               </v-btn>
               <v-list>
-                  <v-list-item v-for="item in posItems" :key="item">
-                      <v-list-tile @click.native="item.display=!item.display">
-                          <v-list-tile-action>
-                              <v-icon v-if="item.display">check</v-icon>
-                          </v-list-tile-action>
-                          <v-list-tile-title>{{ item.text }}</v-list-tile-title>
-                      </v-list-tile>
-                  </v-list-item>
+                  <v-list-tile v-for="item in posItems" :key="item"
+                      @click.native="item.display=!item.display">
+                      <v-list-tile-action>
+                          <v-icon v-if="item.display">check</v-icon>
+                      </v-list-tile-action>
+                      <v-list-tile-title>{{ item.text }}</v-list-tile-title>
+                  </v-list-tile>
               </v-list>
           </v-menu>
     </v-layout>
@@ -100,7 +99,7 @@ export default {
         }
     },
     created( ){
-        this.restBundleDispatch("loadComponentModel");
+        this.rbDispatch("apiLoad");
     },
     computed: {
         position() {

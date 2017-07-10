@@ -1,13 +1,11 @@
 <template>
 
 <v-card >
-    <v-card-row class="primary white--text" >
-        <v-card-title>
-            <span class="" >Service Home Page</span>
-            <v-spacer></v-spacer>
-            <span  class="">/{{serviceFromUrl}}</span>
-        </v-card-title>
-    </v-card-row>
+    <v-card-title class="primary white--text title" >
+        <span class="" >Service Home Page</span>
+        <v-spacer></v-spacer>
+        <span  class="">/{{serviceFromUrl}}</span>
+    </v-card-title>
     <v-card-text v-show="mode==='connect'">
         <v-btn
             light flat
@@ -47,8 +45,8 @@
             </v-btn>
         </v-bottom-nav>
     </div> 
-    <v-card-row height="60px" style="position:relative">
-    </v-card-row> 
+    <v-card-text height="60px" style="position:relative">
+    </v-card-text> 
 </v-card>
 
 </template><script>
@@ -74,7 +72,7 @@ export default {
     methods: {
         update() {
             this.loading = true;
-            this.$store.dispatch(["restBundle", this.serviceFromUrl, "identity", "loadComponentModel"].join("/"))
+            this.$store.dispatch(["restBundle", this.serviceFromUrl, "identity", "apiLoad"].join("/"))
                 .then(res => (loading = false))
                 .catch(err => (loading = false));
         },

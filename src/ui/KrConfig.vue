@@ -11,14 +11,14 @@
     </rb-about>
 
     <v-card >
-        <v-card-row class="grey lighten-3">
+        <v-card-text class="grey lighten-3">
             <v-card-title>
                 Drives
                 <v-spacer/>
                 <v-pagination circle v-bind:length.number="drives.length" v-model="eDrive"/>
             </v-card-title>
-        </v-card-row>
-        <v-card-row>
+        </v-card-text>
+        <v-card-text>
             <template v-for="(drive,i) in drives">
                 <div v-show="eDrive===i+1" :key="i">
                     <v-container fluid >
@@ -34,17 +34,14 @@
                                <v-menu origin="bottom center" transition="v-scale-transition" top >
                                   <v-btn dark default :disabled="rbBusy" slot="activator">Move Axis</v-btn>
                                   <v-list dense>
-                                    <v-list-item v-for="pct in [0,25,50,75,100].reverse()" 
-                                        @click="positionAxis(i,pct/100)" :key="pct" >
-                                      <v-list-tile :disabled='rbBusy || axisPos(i) == null'> 
+                                    <v-list-tile v-for="pct in [0,25,50,75,100].reverse()" 
+                                        @click="positionAxis(i,pct/100)" :key="pct" 
+                                        :disabled='rbBusy || axisPos(i) == null'> 
                                         <v-list-tile-title >{{pct}}%</v-list-tile-title> 
-                                      </v-list-tile>
-                                    </v-list-item>
-                                    <v-list-item @click="positionAxis(i,'home')" >
-                                      <v-list-tile :disabled="rbBusy" > 
+                                    </v-list-tile>
+                                    <v-list-tile @click="positionAxis(i,'home')" :disabled="rbBusy" > 
                                         <v-list-tile-title >Home</v-list-tile-title> 
-                                      </v-list-tile>
-                                    </v-list-item>
+                                    </v-list-tile>
                                   </v-list>
                                 </v-menu>
                             </v-flex>
@@ -56,7 +53,7 @@
                         :data="drive" :root-key='"drives["+i+"]"' ></rb-tree-view>
                 </div>
             </template>
-        </v-card-row>
+        </v-card-text>
         <v-alert error v-bind:value="error"> {{error}} </v-alert>
     </v-card>
 </div>
@@ -133,7 +130,7 @@ export default {
         KrScrewDrive,
     },
     created() {
-        this.restBundleDispatch("loadComponentModel");
+        this.rbDispatch("apiLoad");
     },
     mounted() {
         console.log("mounted");

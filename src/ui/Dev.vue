@@ -3,8 +3,8 @@
 <v-app id="dev-app" >
    <v-navigation-drawer persistent light v-model="drawer" light>
       <v-list dense>
-        <v-list-item v-for="item in sidebarMain" :key="item">
-          <v-list-tile exact router :href="item.href">
+        <div v-for="item in sidebarMain" :key="item">
+          <v-list-tile exact :to="item.href">
             <v-list-tile-action>
                 <v-icon >{{item.icon}}</v-icon>
             </v-list-tile-action>
@@ -15,10 +15,10 @@
                 <v-icon v-show='$route.path === item.href'>keyboard_arrow_right</v-icon>
             </v-list-tile-action>
           </v-list-tile>
-        </v-list-item>
+        </div>
         <v-list-group value="sidebarRestBundle">
             <v-list-tile slot="item">
-              <v-list-tile-action> <v-icon dark>info</v-icon> </v-list-tile-action>
+              <v-list-tile-action> <v-icon >description</v-icon> </v-list-tile-action>
               <v-list-tile-content>
                 <v-list-tile-title>RestBundle Components</v-list-tile-title>
               </v-list-tile-content>
@@ -26,8 +26,8 @@
                 <v-icon dark>keyboard_arrow_down</v-icon>
               </v-list-tile-action>
             </v-list-tile>
-            <v-list-item v-for="item in sidebarRestBundle" :key="item">
-              <v-list-tile exact router :href="item.href">
+            <div v-for="item in sidebarRestBundle" :key="item">
+              <v-list-tile exact :to="item.href">
                 <v-list-tile-content>
                     <v-list-tile-title>{{ item.title }}</v-list-tile-title>
                 </v-list-tile-content>
@@ -35,11 +35,11 @@
                     <v-icon v-show='$route.path === item.href'>keyboard_arrow_right</v-icon>
                 </v-list-tile-action>
               </v-list-tile>
-            </v-list-item>
+            </div>
         </v-list-group>
         <v-list-group value="sidebarKinannRest">
             <v-list-tile slot="item">
-              <v-list-tile-action> <v-icon dark>info</v-icon> </v-list-tile-action>
+              <v-list-tile-action> <v-icon >description</v-icon> </v-list-tile-action>
               <v-list-tile-content>
                 <v-list-tile-title>KinannRest Components</v-list-tile-title>
               </v-list-tile-content>
@@ -47,8 +47,8 @@
                 <v-icon dark>keyboard_arrow_down</v-icon>
               </v-list-tile-action>
             </v-list-tile>
-            <v-list-item v-for="item in sidebarKinannRest" :key="item">
-              <v-list-tile exact router :href="item.href">
+            <div v-for="item in sidebarKinannRest" :key="item">
+              <v-list-tile exact :to="item.href">
                 <v-list-tile-content>
                     <v-list-tile-title>{{ item.title }}</v-list-tile-title>
                 </v-list-tile-content>
@@ -56,20 +56,24 @@
                     <v-icon v-show='$route.path === item.href'>keyboard_arrow_right</v-icon>
                 </v-list-tile-action>
               </v-list-tile>
-            </v-list-item>
+            </div>
         </v-list-group>
       </v-list>
     </v-navigation-drawer>
-    <v-toolbar fixed class="black" >
-        <v-toolbar-side-icon light @click.native.stop="drawer = !drawer"></v-toolbar-side-icon>
-        <v-toolbar-title class="grey--text text--lighten-1">{{package.name}} {{package.version}}</v-toolbar-title>
-        <v-toolbar-title class="secondary--text hidden-xs-only"
-            style="position:absolute; right:0; ">dev app</v-toolbar-title>
+    <v-toolbar fixed flat class="black" >
+        <v-toolbar-side-icon light class="black white--text" @click.native.stop="drawer = !drawer"></v-toolbar-side-icon>
+        <v-toolbar-title class="grey--text text--lighten-1">
+            <div style="display:flex; flex-flow:column; ">
+                <span class="mr-2" >{{package.name}} {{package.version}}</span>
+                <span class="caption">developer application</span>
+            </div>
+        </v-toolbar-title>
+        <v-spacer/>
+        <rb-web-socket/>
     </v-toolbar>
     <main>
         <v-container fluid> <router-view/> </v-container>
     </main>
-    <rb-web-socket/>
 </v-app>
 
 </template> 
@@ -92,7 +96,7 @@ export default {
             package: require("../../package.json"),
             drawer: false,
             sidebarMain: [{
-                icon: "info",
+                icon: "question_answer",
                 title: "Introduction",
                 href: "/introduction",
             },{
