@@ -1,12 +1,13 @@
-const Kinann = require("kinann");
-const Factory = Kinann.Factory;
-const Variable = Kinann.Variable;
-const StepperDrive = Kinann.StepperDrive;
-const DriveFrame = Kinann.DriveFrame;
-const path = require("path");
-var rb = require("rest-bundle");
-
 (function(exports) {
+    const Kinann = require("kinann");
+    const Factory = Kinann.Factory;
+    const Variable = Kinann.Variable;
+    const StepperDrive = Kinann.StepperDrive;
+    const DriveFrame = Kinann.DriveFrame;
+    const winston = require('winston');
+    const path = require("path");
+    const rb = require("rest-bundle");
+
     class KinannRest extends rb.RestBundle {
         constructor(name = "kinann", options = {}) {
             super(name, Object.assign({
@@ -15,6 +16,7 @@ var rb = require("rest-bundle");
 
             Object.defineProperty(this, "handlers", {
                 value: super.handlers.concat([
+                    this.resourceMethod("get", "kinematics", this.getKinematics),
                     this.resourceMethod("get", "config", this.getConfig),
                     this.resourceMethod("get", "position", this.getPosition),
                     this.resourceMethod("post", "move-to", this.postMoveTo),
@@ -77,6 +79,27 @@ var rb = require("rest-bundle");
                     .then(() => resolve(this.positionResponse()))
                     .catch((err) => reject(err));
             });
+        }
+
+        getKinematics(req, res, next) {
+            return new Promise((resolve, reject) => {
+                var async = function * () {
+                    try {
+                        var model = yield this.loadApiModel()
+                            .then(r=>async.next(r)).catch(e=>async.throw(e));
+                        model = model || {
+                            drives: this.drives,
+                        };
+                        resolve({
+                            apiModel: this.apiHash(model),
+                        });
+                    } catch(err) {
+                        winston.error(err.message, err.stack);
+                        reject(err);
+                    }
+                }.call(this);
+                async.next();
+            })
         }
 
         getConfig(req, res, next) {

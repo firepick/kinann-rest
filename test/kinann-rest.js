@@ -3,10 +3,43 @@
     const KinannRest = require("../src/kinann-rest");
     const supertest = require('supertest');
     const winston = require('winston');
+    const rb = require('rest-bundle');
+    var rbh = new rb.RbHash();
     var app = require("../scripts/server.js");
     winston.level = "warn";
 
     var pkg = require("../package.json");
+    function expectedScrewDrive(axis) {
+        return {
+            gearIn: 1,
+            gearOut: 1,
+            lead: 0.8,
+            maxPos: 10,
+            microsteps: 16,
+            minPos: 0,
+            mstepPulses: 1,
+            steps: 200,
+            type: "ScrewDrive",
+            name: axis,
+            isHomeable: true,
+        }
+    }
+    function expectedBeltDrive(axis) {
+        return {
+            gearIn: 1,
+            gearOut: 1,
+            maxPos: 100,
+            microsteps: 16,
+            minPos: 0,
+            mstepPulses: 1,
+            pitch: 2,
+            steps: 200,
+            teeth: 16,
+            type: "BeltDrive",
+            name: axis,
+            isHomeable: true,
+        }
+    }
     var application_json_200 = {
         statusCode: 200,
         type: "application/json",
@@ -32,6 +65,23 @@
         }();
         async.next();
     });
+    it("GET /kinematics returns kinematic configuration", function(done) {
+        var app = testInit();
+        supertest(app).get("/test/kinematics").expect((res) => {
+            res.statusCode.should.equal(200);
+            var apiModel = res.body.apiModel;
+            should.ok(apiModel);
+            var drives = apiModel.drives;
+            drives.should.instanceOf(Array);
+            drives.length.should.equal(3);
+            should.deepEqual(drives[0], expectedBeltDrive("X"));
+            should.deepEqual(drives[1], expectedBeltDrive("Y"));
+            should.deepEqual(drives[2], expectedScrewDrive("Z"));
+            apiModel.should.properties({
+                rbHash:rbh.hash(apiModel),
+            });
+        }).end((err,res) => {if (err) throw err; else done(); });
+    });
     it("GET /config returns kinann configuration", function(done) {
         var app = testInit();
         supertest(app).get("/test/config").expect((res) => {
@@ -43,47 +93,9 @@
             var drives = config.drives;
             drives.should.instanceOf(Array);
             drives.length.should.equal(3);
-            should.deepEqual(drives[0], {
-                gearIn: 1,
-                gearOut: 1,
-                maxPos: 100,
-                microsteps: 16,
-                minPos: 0,
-                mstepPulses: 1,
-                pitch: 2,
-                steps: 200,
-                teeth: 16,
-                type: "BeltDrive",
-                name: "X",
-                isHomeable: true,
-            });
-            should.deepEqual(drives[1], {
-                gearIn: 1,
-                gearOut: 1,
-                maxPos: 100,
-                microsteps: 16,
-                minPos: 0,
-                mstepPulses: 1,
-                pitch: 2,
-                steps: 200,
-                teeth: 16,
-                type: "BeltDrive",
-                name: "Y",
-                isHomeable: true,
-            });
-            should.deepEqual(drives[2], {
-                gearIn: 1,
-                gearOut: 1,
-                lead: 0.8,
-                maxPos: 10,
-                microsteps: 16,
-                minPos: 0,
-                mstepPulses: 1,
-                steps: 200,
-                type: "ScrewDrive",
-                name: "Z",
-                isHomeable: true,
-            });
+            should.deepEqual(drives[0], expectedBeltDrive("X"));
+            should.deepEqual(drives[1], expectedBeltDrive("Y"));
+            should.deepEqual(drives[2], expectedScrewDrive("Z"));
         }).end((err,res) => {if (err) throw err; else done(); });
     });
     it("GET /state returns DriveFrame state", function(done) {

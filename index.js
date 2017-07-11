@@ -1,10 +1,9 @@
 (function(exports) {
     ///////////////// class ////////////////////
     var pkg = {
-        RestBundle: require("./src/rest-bundle"),
-        ResourceMethod: require("./src/resource-method"),
+        KinannRest: require("./src/kinann-rest"),
     };
 
-    module.exports = exports.RestBundle = pkg;
+    module.exports = exports.KinannRest = pkg;
 })(typeof exports === "object" ? exports : (exports = {}));
 
