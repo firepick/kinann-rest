@@ -4,6 +4,8 @@
     const supertest = require('supertest');
     const winston = require('winston');
     const rb = require('rest-bundle');
+    const fs = require('fs');
+    const KINEMATICS_PATH = 'api-model/KinannRest.test.kinematics.json';
     var rbh = new rb.RbHash();
     var app = require("../scripts/server.js");
     winston.level = "warn";
@@ -66,21 +68,88 @@
         async.next();
     });
     it("GET /kinematics returns kinematic configuration", function(done) {
-        var app = testInit();
-        supertest(app).get("/test/kinematics").expect((res) => {
-            res.statusCode.should.equal(200);
-            var apiModel = res.body.apiModel;
-            should.ok(apiModel);
-            var drives = apiModel.drives;
-            drives.should.instanceOf(Array);
-            drives.length.should.equal(3);
-            should.deepEqual(drives[0], expectedBeltDrive("X"));
-            should.deepEqual(drives[1], expectedBeltDrive("Y"));
-            should.deepEqual(drives[2], expectedScrewDrive("Z"));
-            apiModel.should.properties({
-                rbHash:rbh.hash(apiModel),
-            });
-        }).end((err,res) => {if (err) throw err; else done(); });
+        var async = function* () {
+            try {
+                var app = testInit();
+                fs.existsSync(KINEMATICS_PATH) && fs.unlinkSync(KINEMATICS_PATH);
+                yield supertest(app).get("/test/kinematics").expect((res) => {
+                    res.statusCode.should.equal(200);
+                    var apiModel = res.body.apiModel;
+                    should.ok(apiModel);
+                    var drives = apiModel.drives;
+                    drives.should.instanceOf(Array);
+                    drives.length.should.equal(3);
+                    should.deepEqual(drives[0], expectedBeltDrive("X"));
+                    should.deepEqual(drives[1], expectedBeltDrive("Y"));
+                    should.deepEqual(drives[2], expectedScrewDrive("Z"));
+                    apiModel.should.properties({
+                        rbHash:rbh.hash(apiModel),
+                    });
+                }).end((e,r) => e ? async.throw(e) : async.next(r));
+                done();
+            } catch(err) {
+                winston.error(err.message, err.stack);
+                async.throw(err);
+            }
+        }();
+        async.next();
+    });
+    it("TESTPUT /kinematics saves kinematic configuration", function(done) {
+        var async = function* () {
+            try {
+                var app = testInit();
+                fs.existsSync(KINEMATICS_PATH) && fs.unlinkSync(KINEMATICS_PATH);
+                var result = yield supertest(app).get('/test/kinematics').expect(res => {
+                    res.statusCode.should.equal(200);
+                    should.ok(res.body.apiModel);
+                }).end((e,r) => e ? async.throw(e) : async.next(r));
+                var curState = result.body;
+                var updateState = JSON.parse(JSON.stringify(curState))
+                updateState.apiModel.drives[0].maxPos++;
+                var newState = null;
+                yield supertest(app).put("/test/kinematics").send(updateState).expect((res) => {
+                    res.statusCode.should.equal(200);
+                    should.ok(res.body.apiModel);
+                    newState = JSON.parse(JSON.stringify(updateState));
+                    newState.apiModel.rbHash = rbh.hash(newState.apiModel);
+                    should.deepEqual(res.body, newState);
+                    newState.apiModel.rbHash.should.not.equal(curState.apiModel.rbHash);
+                }).end((e,r) => e ? async.throw(e) : async.next(r));
+                yield supertest(app).get('/test/kinematics').expect(res => {
+                    res.statusCode.should.equal(200);
+                    should.ok(res.body.apiModel);
+                    should.deepEqual(res.body, newState);
+                }).end((e,r) => e ? async.throw(e) : async.next(r));
+                should.ok(fs.existsSync(KINEMATICS_PATH));
+                done();
+            } catch (err) {
+                winston.error(err.message, err.stack);
+                async.throw(err);
+            }
+        }();
+        async.next();
+    });
+    it("PUT /kinematics rejects bad request", function(done) {
+        var async = function* () {
+            try {
+                var app = testInit();
+                var result = yield supertest(app).get('/test/kinematics').expect(res => {
+                    res.statusCode.should.equal(200);
+                    should.ok(res.body.apiModel);
+                }).end((e,r) => e ? async.throw(e) : async.next(r));
+                var curModel = result.body.apiModel;
+                supertest(app).put("/test/kinematics").send("bad request").expect((res) => {
+                    res.statusCode.should.equal(400);
+                    should.ok(res.body.error);
+                    should.ok(res.body.data);
+                    should.deepEqual(res.body.data.apiModel, curModel);
+                }).end((err,res) => {if (err) throw err; else done(); });
+            } catch (err) {
+                winston.error(err.message, err.stack);
+                async.throw(err);
+            }
+        }();
+        async.next();
     });
     it("GET /config returns kinann configuration", function(done) {
         var app = testInit();

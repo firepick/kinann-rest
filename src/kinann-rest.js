@@ -17,12 +17,14 @@
             Object.defineProperty(this, "handlers", {
                 value: super.handlers.concat([
                     this.resourceMethod("get", "kinematics", this.getKinematics),
+                    this.resourceMethod("put", "kinematics", this.putKinematics),
                     this.resourceMethod("get", "config", this.getConfig),
                     this.resourceMethod("get", "position", this.getPosition),
                     this.resourceMethod("post", "move-to", this.postMoveTo),
                     this.resourceMethod("post", "home", this.postHome),
                 ]),
             });
+            this.apiKinematics = `KinannRest.${name}.kinematics`;
             this.drives = options.drives || [
                 new StepperDrive.BeltDrive({
                     minPos: 0,
@@ -81,25 +83,30 @@
             });
         }
 
-        getKinematics(req, res, next) {
+        loadApiModel(name) {
             return new Promise((resolve, reject) => {
-                var async = function * () {
-                    try {
-                        var model = yield this.loadApiModel()
-                            .then(r=>async.next(r)).catch(e=>async.throw(e));
-                        model = model || {
-                            drives: this.drives,
-                        };
+                super.loadApiModel(name)
+                .then(model => {
+                    if (model) {
+                        resolve(model);
+                    } else if (name === this.apiKinematics) {
                         resolve({
-                            apiModel: this.apiHash(model),
+                            drives: this.drives,
                         });
-                    } catch(err) {
-                        winston.error(err.message, err.stack);
-                        reject(err);
+                    } else {
+                        reject(new Error("unknown api model:"+name));
                     }
-                }.call(this);
-                async.next();
-            })
+                })
+                .catch(err => reject(err));
+            });
+        }
+
+        getKinematics(req, res, next) {
+            return this.getApiModel(req, res, next, this.apiKinematics);
+        }
+
+        putKinematics(req, res, next) {
+            return this.putApiModel(req, res, next, this.apiKinematics);
         }
 
         getConfig(req, res, next) {
