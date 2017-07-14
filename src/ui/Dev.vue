@@ -84,6 +84,7 @@ import AllServices from './AllServices.vue';
 import Service from './Service.vue';
 import KrPosition from './KrPosition.vue';
 import KrConfig from './KrConfig.vue';
+import KrDrives from './KrDrives.vue';
 import KrBeltDrive from './KrBeltDrive.vue';
 import KrScrewDrive from './KrScrewDrive.vue';
 import rbvue from "rest-bundle/vue";
@@ -126,6 +127,7 @@ export default {
         Service,
         KrPosition,
         KrConfig,
+        KrDrives,
         KrBeltDrive,
         KrScrewDrive,
     },

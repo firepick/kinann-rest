@@ -54,6 +54,7 @@
 import rbvue from "rest-bundle/vue.js";
 import KrPosition from './KrPosition.vue';
 import KrConfig  from './KrConfig.vue';
+import KrDrives  from './KrDrives.vue';
 
 export default {
     name: "service",
@@ -81,6 +82,7 @@ export default {
     },
     components: {
         KrPosition,
+        KrDrives,
         KrConfig,
     },
 }
