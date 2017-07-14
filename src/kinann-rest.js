@@ -16,15 +16,15 @@
 
             Object.defineProperty(this, "handlers", {
                 value: super.handlers.concat([
-                    this.resourceMethod("get", "kinematics", this.getKinematics),
-                    this.resourceMethod("put", "kinematics", this.putKinematics),
-                    this.resourceMethod("get", "config", this.getConfig),
+                    this.resourceMethod("get", "drives", this.getDrives),
+                    this.resourceMethod("put", "drives", this.putDrives),
+                    //this.resourceMethod("get", "config", this.getConfig),
                     this.resourceMethod("get", "position", this.getPosition),
                     this.resourceMethod("post", "move-to", this.postMoveTo),
                     this.resourceMethod("post", "home", this.postHome),
                 ]),
             });
-            this.apiKinematics = `KinannRest.${name}.kinematics`;
+            this.apiDrives = `KinannRest.${name}.drives`;
             this.drives = options.drives || [
                 new StepperDrive.BeltDrive({
                     minPos: 0,
@@ -89,7 +89,7 @@
                 .then(model => {
                     if (model) {
                         resolve(model);
-                    } else if (name === this.apiKinematics) {
+                    } else if (name === this.apiDrives) {
                         resolve({
                             drives: this.drives,
                         });
@@ -101,19 +101,19 @@
             });
         }
 
-        getKinematics(req, res, next) {
-            return this.getApiModel(req, res, next, this.apiKinematics);
+        getDrives(req, res, next) {
+            return this.getApiModel(req, res, next, this.apiDrives);
         }
 
-        putKinematics(req, res, next) {
-            return this.putApiModel(req, res, next, this.apiKinematics);
+        putDrives(req, res, next) {
+            return this.putApiModel(req, res, next, this.apiDrives);
         }
 
-        getConfig(req, res, next) {
-            return {
-                drives: this.drives,
-            };
-        }
+        //getConfig(req, res, next) {
+            //return {
+                //drives: this.drives,
+            //};
+        //}
 
         getState() {
             var superState = super.getState();

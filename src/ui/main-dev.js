@@ -4,13 +4,13 @@ import VueRouter from 'vue-router';
 import Vuetify from 'vuetify';
 import axios from 'axios';
 import VueAxios from 'vue-axios';
-import rbvue from 'rest-bundle/vue';
+import rbvue from 'rest-bundle/index-vue';
 
 import Dev from './Dev.vue';
 import Introduction from './Introduction.vue';
 import AllServices from './AllServices.vue';
 import Service from './Service.vue';
-import KinannRest from "../../vue";
+import KinannRest from "../../index-vue";
 require('./stylus/main.styl')
 
 Vue.use(VueAxios, axios);

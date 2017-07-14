@@ -87,8 +87,8 @@ import KrConfig from './KrConfig.vue';
 import KrDrives from './KrDrives.vue';
 import KrBeltDrive from './KrBeltDrive.vue';
 import KrScrewDrive from './KrScrewDrive.vue';
-import rbvue from "rest-bundle/vue";
-import krvue from "../../vue";
+import rbvue from "rest-bundle/index-vue";
+import krvue from "../../index-vue";
 
 export default {
     name: 'dev',

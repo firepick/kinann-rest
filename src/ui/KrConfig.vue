@@ -63,7 +63,7 @@
 
 import KrBeltDrive from "./KrBeltDrive.vue";
 import KrScrewDrive from "./KrScrewDrive.vue";
-import rbvue from "rest-bundle/vue";
+import rbvue from "rest-bundle/index-vue";
 
 var positionOpts = [
     { text: 'Home' },

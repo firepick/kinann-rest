@@ -51,7 +51,7 @@
 
 </template><script>
 
-import rbvue from "rest-bundle/vue.js";
+import rbvue from "rest-bundle/index-vue.js";
 import KrPosition from './KrPosition.vue';
 import KrConfig  from './KrConfig.vue';
 import KrDrives  from './KrDrives.vue';

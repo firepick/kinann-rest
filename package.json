@@ -16,7 +16,7 @@
     "express": "^4.13.3",
     "file-loader": "^0.11.1",
     "kinann": "^0.8.1",
-    "rest-bundle": "^0.15.14",
+    "rest-bundle": "^0.16.1",
     "serialport": "^4.0.7",
     "style-loader": "^0.17.0",
     "stylus": "^0.54.5",

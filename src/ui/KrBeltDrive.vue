@@ -47,7 +47,7 @@
 </template>
 <script>
 
-import rbvue from 'rest-bundle/vue.js';
+import rbvue from 'rest-bundle/index-vue.js';
 
 function defaultDrive() {
     console.log("defaultDrive");

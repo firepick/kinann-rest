@@ -52,7 +52,7 @@
 </template>
 <script>
 
-import rbvue from "rest-bundle/vue";
+import rbvue from "rest-bundle/index-vue";
 import Vue from "vue";
 
 export default {
