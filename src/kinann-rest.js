@@ -25,7 +25,8 @@
                 ]),
             });
             this.apiDrives = `KinannRest.${name}.drives`;
-            this.drives = options.drives || [
+            this.options = Object.assign({},options);
+            var drives = options.drives || [
                 new StepperDrive.BeltDrive({
                     minPos: 0,
                     maxPos: 100,
@@ -42,7 +43,17 @@
                     lead: 0.8, // m5 screw
                 }),
             ];
-            this.df = new DriveFrame(this.drives, options);
+            this.updateDrives(drives);
+        }
+
+        updateDrives(drives) {
+            var json = drives.map(d => JSON.stringify(d));
+            var newDrives = json.map(j => StepperDrive.fromJSON(j));
+            this.df = new DriveFrame(newDrives, this.options);
+        }
+
+        get drives() {
+            return this.df.drives;
         }
 
         get kinann() {
@@ -83,21 +94,35 @@
             });
         }
 
-        loadApiModel(name) {
+        loadApiModel(filePath) {
             return new Promise((resolve, reject) => {
-                super.loadApiModel(name)
+                super.loadApiModel(filePath)
                 .then(model => {
                     if (model) {
+                        this.updateDrives(model.drives);
                         resolve(model);
-                    } else if (name === this.apiDrives) {
+                    } else if (filePath === this.apiDrives) {
                         resolve({
                             drives: this.drives,
                         });
                     } else {
-                        reject(new Error("unknown api model:"+name));
+                        reject(new Error("unknown api model:"+filePath));
                     }
                 })
                 .catch(err => reject(err));
+            });
+        }
+
+        saveApiModel(model, filePath) {
+            return new Promise((resolve, reject) => {
+                super.saveApiModel(model, filePath)
+                .then(res => {
+                    if (filePath === this.apiDrives) {
+                        this.updateDrives(model.drives);
+                    }
+                    resolve(res);
+                })
+                .catch(e => reject(e));
             });
         }
 

@@ -72,7 +72,7 @@
             try {
                 var app = testInit();
                 fs.existsSync(DRIVES_PATH) && fs.unlinkSync(DRIVES_PATH);
-                yield supertest(app).get("/test/drives").expect((res) => {
+                var response = yield supertest(app).get("/test/drives").expect((res) => {
                     res.statusCode.should.equal(200);
                     var apiModel = res.body.apiModel;
                     should.ok(apiModel);
@@ -86,10 +86,21 @@
                         rbHash:rbh.hash(apiModel),
                     });
                 }).end((e,r) => e ? async.throw(e) : async.next(r));
+                var apiModel = response.body.apiModel;
+                apiModel.drives[0].maxPos = 101;
+                apiModel.rbHash = rbh.hash(apiModel);
+                fs.writeFileSync(DRIVES_PATH, JSON.stringify(apiModel, null, "  "));
+                var response = yield supertest(app).get("/test/drives").expect((res) => {
+                    res.statusCode.should.equal(200);
+                    should.deepEqual(res.body.apiModel, apiModel);
+                }).end((e,r) => e ? async.throw(e) : async.next(r));
+                var kr = app.locals.restBundles.filter(rb => rb instanceof KinannRest)[0];
+                should.ok(kr);
+                kr.drives[0].maxPos.should.equal(101);
                 done();
             } catch(err) {
                 winston.error(err.message, err.stack);
-                async.throw(err);
+                throw(err);
             }
         }();
         async.next();
@@ -98,6 +109,8 @@
         var async = function* () {
             try {
                 var app = testInit();
+                var kr = app.locals.restBundles.filter(rb => rb instanceof KinannRest)[0];
+                should.ok(kr);
                 fs.existsSync(DRIVES_PATH) && fs.unlinkSync(DRIVES_PATH);
                 var result = yield supertest(app).get('/test/drives').expect(res => {
                     res.statusCode.should.equal(200);
@@ -105,7 +118,7 @@
                 }).end((e,r) => e ? async.throw(e) : async.next(r));
                 var curState = result.body;
                 var updateState = JSON.parse(JSON.stringify(curState))
-                updateState.apiModel.drives[0].maxPos++;
+                updateState.apiModel.drives[0].maxPos = 102;
                 var newState = null;
                 yield supertest(app).put("/test/drives").send(updateState).expect((res) => {
                     res.statusCode.should.equal(200);
@@ -115,16 +128,19 @@
                     should.deepEqual(res.body, newState);
                     newState.apiModel.rbHash.should.not.equal(curState.apiModel.rbHash);
                 }).end((e,r) => e ? async.throw(e) : async.next(r));
+                kr.drives[0].maxPos.should.equal(102);
                 yield supertest(app).get('/test/drives').expect(res => {
                     res.statusCode.should.equal(200);
                     should.ok(res.body.apiModel);
                     should.deepEqual(res.body, newState);
                 }).end((e,r) => e ? async.throw(e) : async.next(r));
                 should.ok(fs.existsSync(DRIVES_PATH));
+                kr.drives[0].maxPos.should.equal(102);
+                kr.df.drives[0].maxPos.should.equal(102);
                 done();
             } catch (err) {
                 winston.error(err.message, err.stack);
-                async.throw(err);
+                throw(err);
             }
         }();
         async.next();
