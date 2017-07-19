@@ -49,11 +49,30 @@
                 <v-flex xs1 class="text-xs-center">{{drive.gearOut}}:{{drive.gearIn}}</v-flex>
                 <v-flex xs1>
                         <v-btn small icon :disabled="rbBusy" slot="activator"
+                            @click.native.stop = 'apiOpen()'
                             class="primary--text"
                             ><v-icon>edit</v-icon></v-btn>
                 </v-flex>
             </v-layout>
         </v-card-text >
+        <div v-for="(drive,i) in drives" key="i">
+            <rb-api-dialog :apiSvc='this'>
+                <span slot="title">Drive {{drive.name}} Settings</span>
+                <v-layout>
+                    <v-flex xs3 class="body-2">Messages received</v-flex>
+                    <v-flex>{{pushCount}} </v-flex>
+                </v-layout>
+                <v-layout>
+                    <v-flex xs3 class="body-2">Push interval</v-flex>
+                    <v-flex>
+                        <v-text-field name="name_pushStateMillis" id="id_pushStateMillis"
+                            v-model='apiModel.pushStateMillis' :rules="[apiRules.required, apiRules.gt0]"
+                            label="Milliseconds" >
+                        </v-text-field>
+                    </v-flex>
+                </v-layout>
+            </rb-api-dialog>
+        </div>
 
         <v-alert error v-bind:value="error"> {{error}} </v-alert>
     </v-card>
@@ -65,6 +84,7 @@
 import KrBeltDrive from "./KrBeltDrive.vue";
 import KrScrewDrive from "./KrScrewDrive.vue";
 import rbvue from "rest-bundle/index-vue";
+const RbApiDialog = rbvue.components.RbApiDialog;
 
 var positionOpts = [
     { text: 'Home' },
@@ -91,6 +111,10 @@ export default {
             error:"",
             newPos:"",
             positionOpts,
+            apiRules: {
+                required: (value) => !!value || 'Required',
+                gt0: (value) => Number(value) > 0 || 'Positive number',
+            },
         }
     },
     methods: {
@@ -121,6 +145,7 @@ export default {
     components: {
         KrBeltDrive,
         KrScrewDrive,
+        RbApiDialog,
     },
     created() {
         this.rbDispatch("apiLoad");
