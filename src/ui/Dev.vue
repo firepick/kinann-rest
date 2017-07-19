@@ -3,7 +3,7 @@
 <v-app id="dev-app" >
    <v-navigation-drawer persistent light v-model="drawer" light>
       <v-list dense>
-        <div v-for="item in sidebarMain" :key="item">
+        <div v-for="(item,i) in sidebarMain" :key="i">
           <v-list-tile exact :to="item.href">
             <v-list-tile-action>
                 <v-icon >{{item.icon}}</v-icon>
@@ -26,7 +26,7 @@
                 <v-icon dark>keyboard_arrow_down</v-icon>
               </v-list-tile-action>
             </v-list-tile>
-            <div v-for="item in sidebarRestBundle" :key="item">
+            <div v-for="(item,i) in sidebarRestBundle" :key="i">
               <v-list-tile exact :to="item.href">
                 <v-list-tile-content>
                     <v-list-tile-title>{{ item.title }}</v-list-tile-title>
@@ -47,7 +47,7 @@
                 <v-icon dark>keyboard_arrow_down</v-icon>
               </v-list-tile-action>
             </v-list-tile>
-            <div v-for="item in sidebarKinannRest" :key="item">
+            <div v-for="(item,i) in sidebarKinannRest" :key="i">
               <v-list-tile exact :to="item.href">
                 <v-list-tile-content>
                     <v-list-tile-title>{{ item.title }}</v-list-tile-title>
@@ -61,7 +61,7 @@
       </v-list>
     </v-navigation-drawer>
     <v-toolbar fixed flat class="black" >
-        <v-toolbar-side-icon light class="black white--text" @click.native.stop="drawer = !drawer"></v-toolbar-side-icon>
+        <v-toolbar-side-icon light class="black white--text" @click.stop="drawer = !drawer"></v-toolbar-side-icon>
         <v-toolbar-title class="grey--text text--lighten-1">
             <div style="display:flex; flex-flow:column; ">
                 <span class="mr-2" >{{package.name}} {{package.version}}</span>

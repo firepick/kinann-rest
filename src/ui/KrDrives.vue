@@ -32,11 +32,11 @@
                             ><v-icon>gamepad</v-icon></v-btn>
                         <v-list dense>
                             <v-list-tile v-for="pct in [0,25,50,75,100].reverse()" 
-                                @click.native="positionAxis(i,pct/100)" :key="pct" 
+                                @click="positionAxis(i,pct/100)" :key="pct" 
                                 :disabled='rbBusy || axisPos(i) == null'> 
                                 <v-list-tile-title >{{pct}}%</v-list-tile-title> 
                             </v-list-tile>
-                            <v-list-tile @click.native="positionAxis(i,'home')" :disabled="rbBusy" > 
+                            <v-list-tile @click="positionAxis(i,'home')" :disabled="rbBusy" > 
                                 <v-list-tile-title >Home</v-list-tile-title> 
                             </v-list-tile>
                         </v-list>
@@ -49,7 +49,7 @@
                 <v-flex xs1 class="text-xs-center">{{drive.gearOut}}:{{drive.gearIn}}</v-flex>
                 <v-flex xs1>
                         <v-btn small icon :disabled="rbBusy" slot="activator"
-                            @click.native.stop = 'apiOpen()'
+                            @click.stop = 'apiOpen()'
                             class="primary--text"
                             ><v-icon>edit</v-icon></v-btn>
                 </v-flex>

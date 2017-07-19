@@ -25,7 +25,7 @@
               <v-chip v-for="item in posItems" :key="item.text" 
                   v-show="item.display"
                   @input="item.display=!item.display"
-                  @click.native.stop
+                  @click.stop
                   light
                   class="chip--select-multi pl-4 grey lighten-3"
                   >
@@ -37,8 +37,8 @@
                   <v-icon>menu</v-icon>
               </v-btn>
               <v-list>
-                  <v-list-tile v-for="item in posItems" :key="item"
-                      @click.native="item.display=!item.display">
+                  <v-list-tile v-for="item in posItems" :key="item.text"
+                      @click="item.display=!item.display">
                       <v-list-tile-action>
                           <v-icon v-if="item.display">check</v-icon>
                       </v-list-tile-action>

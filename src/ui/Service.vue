@@ -10,7 +10,7 @@
         <v-btn
             light flat
             v-bind:loading="loading" 
-            @click.native="update()" 
+            @click="update()" 
             v-bind:disabled="loading"
             >Verify Connections</v-btn>
         <v-card hover v-tooltip:bottom='{html:"<rb-identity/>"}' >
@@ -31,15 +31,15 @@
     </v-card-text>
     <div style="position:relative">
         <v-bottom-nav style="bottom:60px" class="transparent">
-            <v-btn flat light class="teal--text" @click.native="mode='connect'" :value="mode === 'connect'">
+            <v-btn flat light class="teal--text" @click="mode='connect'" :value="mode === 'connect'">
               <span>Connect</span>
               <v-icon>cloud</v-icon>
             </v-btn>
-            <v-btn flat light class="teal--text" @click.native="mode='configure'" :value="mode === 'configure'">
+            <v-btn flat light class="teal--text" @click="mode='configure'" :value="mode === 'configure'">
               <span>Configure</span>
               <v-icon>build</v-icon>
             </v-btn>
-            <v-btn flat light class="teal--text" @click.native="mode = 'operate'" :value="mode === 'operate'">
+            <v-btn flat light class="teal--text" @click="mode = 'operate'" :value="mode === 'operate'">
               <span>Operate</span>
               <v-icon>face</v-icon>
             </v-btn>
