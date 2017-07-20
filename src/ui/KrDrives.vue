@@ -43,21 +43,21 @@
                     </v-menu>
                 </v-flex>
                 <v-flex xs2 class="text-xs-center"> {{ axisPos(i) == null ? 'n/a' : axisPos(i) }} </v-flex>
-                <v-flex xs2>{{drive.minPos}}&#8596;{{drive.maxPos}}</v-flex>
+                <v-flex xs2>[{{drive.minPos}}; {{drive.maxPos}}]</v-flex>
                 <v-flex xs2>{{drive.type}}</v-flex>
                 <v-flex xs2>{{drive.steps}}&#x00d7;{{drive.microsteps}}@{{drive.mstepPulses}}</v-flex>
                 <v-flex xs1 class="text-xs-center">{{drive.gearOut}}:{{drive.gearIn}}</v-flex>
                 <v-flex xs1>
                         <v-btn small icon :disabled="rbBusy" slot="activator"
-                            @click.stop = 'apiOpen()'
+                            @click.stop = 'apiEdit("drive"+i)'
                             class="primary--text"
                             ><v-icon>edit</v-icon></v-btn>
                 </v-flex>
             </v-layout>
         </v-card-text >
         <div v-for="(drive,i) in drives" key="i">
-            <rb-api-dialog :apiSvc='this'>
-                <span slot="title">Drive {{drive.name}} Settings</span>
+            <rb-api-dialog :apiToggle='"drive"+i' :apiSvc='_self'>
+                <span slot="title">Drive{{i}} {{drive.name}} Settings</span>
                 <v-layout>
                     <v-flex xs3 class="body-2">Messages received</v-flex>
                     <v-flex>{{pushCount}} </v-flex>
@@ -65,9 +65,9 @@
                 <v-layout>
                     <v-flex xs3 class="body-2">Push interval</v-flex>
                     <v-flex>
-                        <v-text-field name="name_pushStateMillis" id="id_pushStateMillis"
-                            v-model='apiModel.pushStateMillis' :rules="[apiRules.required, apiRules.gt0]"
-                            label="Milliseconds" >
+                        <v-text-field 
+                            v-model='drives[i].name' :rules="[apiRules.required]"
+                            label="Name" >
                         </v-text-field>
                     </v-flex>
                 </v-layout>
@@ -107,6 +107,7 @@ export default {
     data: function() {
         this.restBundleModel();
         return {
+            apiSvc: this,
             eDrive: 1,
             error:"",
             newPos:"",
