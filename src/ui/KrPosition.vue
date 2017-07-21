@@ -75,12 +75,14 @@ export default {
             default: "position",
         }
     },
-    data: function() {
+    created() {
         this.restBundleModel({
             motor: [],
             axis: [],
             world: [],
         });
+    },
+    data: function() {
         return {
             showDetail: false, 
             posItems: [{

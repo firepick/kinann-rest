@@ -6,7 +6,6 @@
             Position is in drive coordinates (vs. application coordinates).
         </p>
         <rb-about-item name="about" value="false" slot="prop">Show this descriptive text</rb-about-item>
-        <rb-about-item name="model" value="drives" slot="prop">RestBundle state name</rb-about-item>
         <rb-about-item name="service" value="test" slot="prop">RestBundle name</rb-about-item>
     </rb-about>
 
@@ -57,20 +56,43 @@
         </v-card-text >
         <div v-for="(drive,i) in drives" key="i">
             <rb-api-dialog :apiToggle='"drive"+i' :apiSvc='_self'>
-                <span slot="title">Drive{{i}} {{drive.name}} Settings</span>
-                <v-layout>
-                    <v-flex xs3 class="body-2">Messages received</v-flex>
-                    <v-flex>{{pushCount}} </v-flex>
-                </v-layout>
-                <v-layout>
-                    <v-flex xs3 class="body-2">Push interval</v-flex>
-                    <v-flex>
-                        <v-text-field 
-                            v-model='drives[i].name' :rules="[apiRules.required]"
-                            label="Name" >
-                        </v-text-field>
+                <span slot="title">{{drive.name}} Drive{{i}} Settings</span>
+                <rb-dialog-row label="Name">
+                    <v-text-field v-model='drives[i].name' :rules="[apiRules.required]" >
+                    </v-text-field>
+                </rb-dialog-row>
+                <rb-dialog-row label="Homing">
+                    <v-select v-bind:items="homeable" v-model="drive.isHomeable"
+                              label="Select" single-line ></v-select>
+                </rb-dialog-row>
+                <rb-dialog-row label="Axis limits">
+                    <v-flex xs3 v-tooltip:top='{html:"Axis position when homed"}' slot="v-layout"> 
+                        <v-text-field label="Home" v-model="drive.minPos" ></v-text-field> 
                     </v-flex>
-                </v-layout>
+                    <v-flex xs3 slot="v-layout"> 
+                        <v-text-field label="Maximum" v-model="drive.maxPos" ></v-text-field> 
+                    </v-flex>
+                </rb-dialog-row>
+                <rb-dialog-row label="Stepper motor">
+                    <v-flex xs3 v-tooltip:top='{html:"Motor steps per revolution"}' slot="v-layout"> 
+                        <v-text-field label="Steps" v-model="drive.steps" ></v-text-field> </v-flex>
+                    <v-flex xs3 v-tooltip:top='{html:"Positioning unit"}' slot="v-layout"> 
+                        <v-text-field label="Microsteps" v-model="drive.microsteps" ></v-text-field> </v-flex>
+                    <v-flex xs3 v-tooltip:top='{html:"Pulses sent for each unit position"}' slot="v-layout"> 
+                        <v-text-field label="Pulses" v-model="drive.mstepPulses" ></v-text-field> </v-flex>
+                </rb-dialog-row>
+                <rb-dialog-row label="Gear ratio">
+                    <v-flex xs3 slot="v-layout"> 
+                        <v-text-field label="Input" v-model="drive.gearIn" ></v-text-field> </v-flex>
+                    <v-flex xs3 slot="v-layout"> 
+                        <v-text-field label="Output" v-model="drive.gearOut" ></v-text-field> </v-flex>
+                </rb-dialog-row>
+                <rb-dialog-row label="Type">
+                    <v-select xs6 v-bind:items="driveTypes" v-model="drive.type"
+                        label="Select" single-line></v-select>
+                </rb-dialog-row>
+                <kr-belt-drive v-show='drive.type === "BeltDrive"' :drive="drive"></kr-belt-drive>
+                <kr-screw-drive v-show='drive.type === "ScrewDrive"' :drive="drive"></kr-screw-drive>
             </rb-api-dialog>
         </div>
 
@@ -97,18 +119,29 @@ var positionOpts = [
 export default {
     mixins: [ 
         rbvue.mixins.RbAboutMixin, 
-        rbvue.mixins.RbApiMixin,
+        rbvue.mixins.RbApiMixin.createMixin("drives"),
     ],
     props: {
-        model: {
-            default: "drives",
-        },
     },
     data: function() {
         this.restBundleModel();
         return {
             apiSvc: this,
             eDrive: 1,
+            homeable: [{
+                text: "Home to limit switch",
+                value: true,
+            },{
+                text: "Use current position as home",
+                value: false,
+            }],
+            driveTypes: [{
+                text: "BeltDrive",
+                value: "BeltDrive",
+            },{
+                text: "ScrewDrive",
+                value: "ScrewDrive",
+            }],
             error:"",
             newPos:"",
             positionOpts,

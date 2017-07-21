@@ -16,7 +16,7 @@
     "express": "^4.13.3",
     "file-loader": "^0.11.1",
     "kinann": "^0.8.1",
-    "rest-bundle": "^0.17.2",
+    "rest-bundle": "^0.19.5",
     "serialport": "^4.0.7",
     "style-loader": "^0.17.0",
     "stylus": "^0.54.5",
@@ -33,9 +33,6 @@
     "mocha": "^3.2.0",
     "should": "^11.2.0",
     "supertest": "^3.0.0",
-    "vue-loader": "^11.1.4",
-    "vue-template-compiler": "^2.4.1",
-    "vue-template-es2015-compiler": "^1.5.3",
     "webpack": "^2.4.1",
     "webpack-dev-server": "^2.2.0"
   },
