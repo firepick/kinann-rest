@@ -167,24 +167,6 @@
         }();
         async.next();
     });
-    it("GET /config returns kinann configuration", function(done) {
-        done();
-        return;// deprecated
-        var app = testInit();
-        supertest(app).get("/test/config").expect((res) => {
-            res.statusCode.should.equal(200);
-            res.headers["content-type"].should.match(/json/);
-            res.headers["content-type"].should.match(/utf-8/);
-            var config  = res.body;
-            config.should.properties(["drives"]);
-            var drives = config.drives;
-            drives.should.instanceOf(Array);
-            drives.length.should.equal(3);
-            should.deepEqual(drives[0], expectedBeltDrive("X"));
-            should.deepEqual(drives[1], expectedBeltDrive("Y"));
-            should.deepEqual(drives[2], expectedScrewDrive("Z"));
-        }).end((err,res) => {if (err) throw err; else done(); });
-    });
     it("GET /state returns DriveFrame state", function(done) {
         var async = function*() {
             testInit();

@@ -18,7 +18,6 @@
                 value: super.handlers.concat([
                     this.resourceMethod("get", "drives", this.getDrives),
                     this.resourceMethod("put", "drives", this.putDrives),
-                    //this.resourceMethod("get", "config", this.getConfig),
                     this.resourceMethod("get", "position", this.getPosition),
                     this.resourceMethod("post", "move-to", this.postMoveTo),
                     this.resourceMethod("post", "home", this.postHome),
@@ -133,12 +132,6 @@
         putDrives(req, res, next) {
             return this.putApiModel(req, res, next, this.apiDrives);
         }
-
-        //getConfig(req, res, next) {
-            //return {
-                //drives: this.drives,
-            //};
-        //}
 
         getState() {
             var superState = super.getState();
