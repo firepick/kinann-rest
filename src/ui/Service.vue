@@ -53,7 +53,6 @@
 
 import rbvue from "rest-bundle/index-vue.js";
 import KrPosition from './KrPosition.vue';
-import KrConfig  from './KrConfig.vue';
 import KrDrives  from './KrDrives.vue';
 
 export default {
@@ -83,7 +82,6 @@ export default {
     components: {
         KrPosition,
         KrDrives,
-        KrConfig,
     },
 }
 

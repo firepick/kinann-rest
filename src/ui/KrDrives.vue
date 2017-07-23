@@ -10,52 +10,88 @@
     </rb-about>
 
     <v-card >
-        <v-card-text >
-            <v-layout class="body-2">
-                <v-flex xs1>Drive</v-flex>
-                <v-flex xs1 class="text-xs-center">Move </v-flex>
-                <v-flex xs2 class="text-xs-center">Position </v-flex>
-                <v-flex xs2>Range </v-flex>
-                <v-flex xs2>Type</v-flex>
-                <v-flex xs2 v-tooltip:top='{html:"steps \u00d7 microsteps @ mstepPulses"}'>Steps </v-flex>
-                <v-flex xs1 class="text-xs-center">Gear </v-flex>
-                <v-flex xs1 class="text-xs-center">Edit </v-flex>
-            </v-layout>
-            <v-layout v-for='(drive,i) in drives' :key='i'
-                align-baseline>
-                <v-flex xs1>[{{i}}] {{drive.name}}</v-flex>
-                <v-flex xs1> 
-                     <v-menu origin="bottom center" transition="v-scale-transition" top >
-                        <v-btn small icon :disabled="rbBusy" slot="activator"
-                            class="primary--text"
-                            ><v-icon>gamepad</v-icon></v-btn>
-                        <v-list dense>
-                            <v-list-tile v-for="pct in [0,25,50,75,100].reverse()" 
-                                @click="positionAxis(i,pct/100)" :key="pct" 
-                                :disabled='rbBusy || axisPos(i) == null'> 
-                                <v-list-tile-title >{{pct}}%</v-list-tile-title> 
-                            </v-list-tile>
-                            <v-list-tile @click="positionAxis(i,'home')" :disabled="rbBusy" > 
-                                <v-list-tile-title >Home</v-list-tile-title> 
-                            </v-list-tile>
-                        </v-list>
-                    </v-menu>
-                </v-flex>
-                <v-flex xs2 class="text-xs-center"> {{ axisPos(i) == null ? 'n/a' : axisPos(i) }} </v-flex>
-                <v-flex xs2>[{{drive.minPos}}; {{drive.maxPos}}]</v-flex>
-                <v-flex xs2>{{drive.type}}</v-flex>
-                <v-flex xs2>{{drive.steps}}&#x00d7;{{drive.microsteps}}@{{drive.mstepPulses}}</v-flex>
-                <v-flex xs1 class="text-xs-center">{{drive.gearOut}}:{{drive.gearIn}}</v-flex>
-                <v-flex xs1>
-                        <v-btn small icon :disabled="rbBusy" slot="activator"
-                            @click.stop = 'apiEdit("drive"+i)'
-                            class="primary--text"
-                            ><v-icon>edit</v-icon></v-btn>
-                </v-flex>
-            </v-layout>
-        </v-card-text >
+        <v-toolbar dark dense card flat class="mb-3 secondary">
+            <v-toolbar-title class="subheading">/{{service}}/{{apiName}}</v-toolbar-title>
+            <v-spacer/>
+            <v-dialog v-model="confirmDelete" v-if="selectedDrive" style="position:relative">
+                <v-btn slot="activator" icon light flat class="secondary" >
+                    <v-icon>delete</v-icon>
+                </v-btn>
+                <v-card>
+                    <v-card-title>Delete {{selectedDrive.name}} drive permanently?</v-card-title>
+                    <v-card-actions>
+                        <v-btn dark secondary @click="confirmDelete=false">Cancel</v-btn>
+                        <v-spacer/>
+                        <v-btn error @click="deleteDrive(selectedDrive)">Delete</v-btn>
+                    </v-card-actions>
+                </v-card>
+            </v-dialog>
+            <!--v-btn icon light flat class="secondary" v-if="selectedDrive">
+                <v-icon>delete</v-icon>
+            </v-btn-->
+            <v-btn icon light flat class="secondary">
+                <v-icon>add</v-icon>
+            </v-btn>
+        </v-toolbar>
+        <v-list>
+            <v-list-tile >
+                <v-list-tile-content>
+                    <v-container fluid class="body-2">
+                        <v-layout align-baseline child-flex-m wrap justify-space-between>
+                            <v-flex xs1 class="text-xs-center hidden-xs-only">Drive</span></v-flex>
+                            <v-flex xs1 class="text-xs-center">Move</v-flex>
+                            <v-flex xs2 class="text-xs-center">Position</v-flex>
+                            <v-flex xs2 class="text-xs-center hidden-xs-only">Range</v-flex>
+                            <v-flex xs2 class="text-xs-center hidden-xs-only">Type</v-flex>
+                            <v-flex xs2 class="text-xs-center hidden-xs-only">Steps</v-flex>
+                            <v-flex xs1 class="text-xs-center hidden-xs-only">Gear</v-flex>
+                            <v-flex xs1 class="text-xs-center">Edit</v-flex>
+                        </v-layout>
+                    </v-container>
+                </v-list-tile-content>
+            </v-list-tile>
+            <v-list-tile v-for='(drive,i) in drives' :key='i'>
+                <v-list-tile-content @click='onClickDrive(drive)'>
+                    <v-container fluid :class="selectionClass(drive)">
+                        <v-layout align-baseline child-flex-m wrap justify-space-between>
+                            <v-flex xs1 class="text-xs-center hidden-xs-only">{{drive.name}}</v-flex>
+                            <v-flex xs1 class="text-xs-center">
+                                 <v-menu origin="bottom center" transition="v-scale-transition" top >
+                                    <v-btn small icon :disabled="rbBusy" slot="activator"
+                                        class="primary--text"
+                                        ><v-icon>gamepad</v-icon></v-btn>
+                                    <v-list dense>
+                                        <v-list-tile v-for="pct in [0,25,50,75,100].reverse()" 
+                                            @click="positionAxis(i,pct/100)" :key="pct" 
+                                            :disabled='rbBusy || axisPos(i) == null'> 
+                                            <v-list-tile-title >{{pct}}%</v-list-tile-title> 
+                                        </v-list-tile>
+                                        <v-list-tile @click="positionAxis(i,'home')" :disabled="rbBusy" > 
+                                            <v-list-tile-title >Home</v-list-tile-title> 
+                                        </v-list-tile>
+                                    </v-list>
+                                </v-menu>
+                            </v-flex>
+                            <v-flex xs2 class="text-xs-center"> {{ axisPos(i) == null ? 'n/a' : axisPos(i) }} </v-flex>
+                            <v-flex xs2 class="text-xs-center hidden-xs-only">[{{drive.minPos}}; {{drive.maxPos}}]</v-flex>
+                            <v-flex xs2 class="text-xs-center hidden-xs-only">{{drive.type}}</v-flex>
+                            <v-flex xs2 class="text-xs-center hidden-xs-only">
+                                {{drive.steps}}&#x00d7;{{drive.microsteps}}@{{drive.mstepPulses}}</v-flex>
+                            <v-flex xs1 class="text-xs-center hidden-xs-only">
+                                {{drive.gearOut}}:{{drive.gearIn}}</v-flex>
+                            <v-flex xs1 class="text-xs-center">
+                                    <v-btn small icon :disabled="rbBusy" slot="activator"
+                                        @click.stop = 'apiEdit("drive"+i)'
+                                        class="primary--text"
+                                        ><v-icon>edit</v-icon></v-btn>
+                            </v-flex>
+                        </v-layout>
+                    </v-container>
+                </v-list-tile-content>
+            </v-list-tile>
+        </v-list>
         <div v-for="(drive,i) in drives" key="i">
-            <rb-api-dialog :apiToggle='"drive"+i' :apiSvc='_self'>
+            <rb-api-dialog :apiDialog='"drive"+i' :apiSvc='_self'>
                 <span slot="title">{{drive.name}} Drive{{i}} Settings</span>
                 <rb-dialog-row label="Name">
                     <v-text-field v-model='drives[i].name' :rules="[apiRules.required]" >
@@ -126,8 +162,9 @@ export default {
     data: function() {
         this.restBundleModel();
         return {
+            confirmDelete: false,
             apiSvc: this,
-            eDrive: 1,
+            selectedDrive: null,
             homeable: [{
                 text: "Home to limit switch",
                 value: true,
@@ -152,6 +189,9 @@ export default {
         }
     },
     methods: {
+        onClickDrive(drive) {
+            this.selectedDrive = this.selectedDrive === drive ? null : drive;
+        },
         positionAxis(axis, goal) {
             console.log("positionAxis", axis, goal);
             if (goal === "home") {
@@ -169,6 +209,20 @@ export default {
             var position = this.restBundleService().position;
             var axis = position && position.axis;
             return axis && axis[iAxis];
+        },
+        selectionClass(drive) {
+            return drive === this.selectedDrive ? "selectedDrive body-2" : "body-1";
+        },
+        deleteDrive(drive) {
+            var iDrive = this.drives.indexOf(drive);
+            if (iDrive != null) {
+                console.log("deleteDrive",drive.name, iDrive);
+                var apiModelCopy = this.apiEdit();
+                this.$delete(apiModelCopy.drives, iDrive);
+                this.apiSave();
+                this.selectedDrive = null;
+                this.confirmDelete = false;
+            }
         },
     },
     computed: {
@@ -190,4 +244,8 @@ export default {
 }
 
 </script>
-<style> </style>
+<style> 
+.selectedDrive {
+    border: 2pt solid #fb8c00;
+}
+</style>
