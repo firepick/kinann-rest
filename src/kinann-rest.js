@@ -7,6 +7,17 @@
     const winston = require('winston');
     const path = require("path");
     const rb = require("rest-bundle");
+    const DRIVE_NAMES = [
+        'X',
+        'Y',
+        'Z',
+        'A',
+        'B',
+        'C',
+        'D',
+        'E',
+        'F',
+    ];
 
     class KinannRest extends rb.RestBundle {
         constructor(name = "kinann", options = {}) {
@@ -18,6 +29,9 @@
                 value: super.handlers.concat([
                     this.resourceMethod("get", "drives", this.getDrives),
                     this.resourceMethod("put", "drives", this.putDrives),
+                    this.resourceMethod("get", "drives/ScrewDrive", this.getScrewDrive),
+                    this.resourceMethod("get", "drives/BeltDrive", this.getBeltDrive),
+                    this.resourceMethod("get", "drives/GearDrive", this.getGearDrive),
                     this.resourceMethod("get", "position", this.getPosition),
                     this.resourceMethod("post", "move-to", this.postMoveTo),
                     this.resourceMethod("post", "home", this.postHome),
@@ -26,21 +40,9 @@
             this.apiDrives = `KinannRest.${name}.drives`;
             this.options = Object.assign({},options);
             var drives = options.drives || [
-                new StepperDrive.BeltDrive({
-                    minPos: 0,
-                    maxPos: 100,
-                    teeth: 16,
-                }),
-                new StepperDrive.BeltDrive({
-                    minPos: 0,
-                    maxPos: 100,
-                    teeth: 16,
-                }),
-                new StepperDrive.ScrewDrive({
-                    minPos: 0,
-                    maxPos: 10,
-                    lead: 0.8, // m5 screw
-                }),
+                new StepperDrive.BeltDrive(),
+                new StepperDrive.BeltDrive(),
+                new StepperDrive.ScrewDrive(),
             ];
             this.updateDrives(drives);
         }
@@ -63,13 +65,36 @@
             return this.knn = knn;
         }
 
+        driveName(iDrive) {
+            var name = DRIVE_NAMES[iDrive];
+            return name || ("Drive"+iDrive);
+        }
+
         positionResponse() {
-            var axisPos = this.df.axisPos;
-            var motorPos = this.df.toMotorPos(axisPos);
+            var drivePos = this.df.drivePos;
+            var motorPos = this.df.toMotorPos(drivePos);
             return {
                 motor: motorPos,
-                axis: axisPos,
+                axis: drivePos,
             }
+        }
+
+        getScrewDrive(req, res, next) {
+            return new StepperDrive.ScrewDrive({
+                name: this.driveName(this.drives.length),
+            });
+        }
+
+        getBeltDrive(req, res, next) {
+            return new StepperDrive.BeltDrive({
+                name: this.driveName(this.drives.length),
+            });
+        }
+
+        getGearDrive(req, res, next) {
+            return new StepperDrive.GearDrive({
+                name: this.driveName(this.drives.length),
+            });
         }
 
         getPosition(req, res, next) {

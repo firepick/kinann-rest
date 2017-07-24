@@ -11,16 +11,35 @@
     winston.level = "warn";
 
     var pkg = require("../package.json");
+    function expectedGearDrive(axis) {
+        return {
+            gearIn: 1,
+            gearOut: 1,
+            lead: 0.8,
+            maxPos: 360,
+            microsteps: 16,
+            minPos: 0,
+            mstepPulses: 1,
+            pitch: 2,
+            steps: 200,
+            teeth: 16,
+            type: "GearDrive",
+            name: axis,
+            isHomeable: true,
+        }
+    }
     function expectedScrewDrive(axis) {
         return {
             gearIn: 1,
             gearOut: 1,
             lead: 0.8,
-            maxPos: 10,
+            maxPos: 100,
             microsteps: 16,
             minPos: 0,
             mstepPulses: 1,
+            pitch: 2,
             steps: 200,
+            teeth: 16,
             type: "ScrewDrive",
             name: axis,
             isHomeable: true,
@@ -30,6 +49,7 @@
         return {
             gearIn: 1,
             gearOut: 1,
+            lead: 0.8,
             maxPos: 100,
             microsteps: 16,
             minPos: 0,
@@ -53,7 +73,7 @@
         var testDriveFrame = krTest(app).df;
         testDriveFrame.serialDriver.mockSerialTimeout = 1;
         testDriveFrame.clearPos(); // initialize
-        should.deepEqual(testDriveFrame.axisPos, [null,null,null]);
+        should.deepEqual(testDriveFrame.drivePos, [null,null,null]);
         return app;
     }
 
@@ -64,6 +84,57 @@
             }
             winston.info("test suite initialized");
             done();
+        }();
+        async.next();
+    });
+    it("GET /drives/ScrewDrive returns default ScrewDrive configuration", function(done) {
+        var async = function* () {
+            try {
+                var app = testInit();
+                var response = yield supertest(app).get("/test/drives/ScrewDrive").expect((res) => {
+                    res.statusCode.should.equal(200);
+                    console.log("res", res.body);
+                    should.deepEqual(res.body, expectedScrewDrive("A"));
+                }).end((e,r) => e ? async.throw(e) : async.next(r));
+                done();
+            } catch(err) {
+                winston.error(err.message, err.stack);
+                throw(err);
+            }
+        }();
+        async.next();
+    });
+    it("GET /drives/BeltDrive returns default BeltDrive configuration", function(done) {
+        var async = function* () {
+            try {
+                var app = testInit();
+                var response = yield supertest(app).get("/test/drives/BeltDrive").expect((res) => {
+                    res.statusCode.should.equal(200);
+                    console.log("res", res.body);
+                    should.deepEqual(res.body, expectedBeltDrive("A"));
+                }).end((e,r) => e ? async.throw(e) : async.next(r));
+                done();
+            } catch(err) {
+                winston.error(err.message, err.stack);
+                throw(err);
+            }
+        }();
+        async.next();
+    });
+    it("GET /drives/GearDrive returns default GearDrive configuration", function(done) {
+        var async = function* () {
+            try {
+                var app = testInit();
+                var response = yield supertest(app).get("/test/drives/GearDrive").expect((res) => {
+                    res.statusCode.should.equal(200);
+                    console.log("res", res.body);
+                    should.deepEqual(res.body, expectedGearDrive("A"));
+                }).end((e,r) => e ? async.throw(e) : async.next(r));
+                done();
+            } catch(err) {
+                winston.error(err.message, err.stack);
+                throw(err);
+            }
         }();
         async.next();
     });
@@ -212,13 +283,13 @@
             testInit();
             var testDriveFrame = krTest(app).df;
             yield testDriveFrame.home([true]).then(r => async.next(r));
-            should.deepEqual(testDriveFrame.axisPos, [0,null,null]);
+            should.deepEqual(testDriveFrame.drivePos, [0,null,null]);
             supertest(app).post("/test/home").send([null,10]).expect((res) => {
                 try {
                     res.statusCode.should.equal(200);
                     res.headers["content-type"].should.match(/json/);
                     res.headers["content-type"].should.match(/utf-8/);
-                    should.deepEqual(testDriveFrame.axisPos, [0, 10, null]);
+                    should.deepEqual(testDriveFrame.drivePos, [0, 10, null]);
                     should.deepEqual(res.body, {
                         motor: [0,1000,null],
                         axis: [0,10,null],

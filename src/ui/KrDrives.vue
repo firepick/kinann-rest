@@ -63,7 +63,7 @@
                                     <v-list dense>
                                         <v-list-tile v-for="pct in [0,25,50,75,100].reverse()" 
                                             @click="positionAxis(i,pct/100)" :key="pct" 
-                                            :disabled='rbBusy || axisPos(i) == null'> 
+                                            :disabled='rbBusy || drivePos(i) == null'> 
                                             <v-list-tile-title >{{pct}}%</v-list-tile-title> 
                                         </v-list-tile>
                                         <v-list-tile @click="positionAxis(i,'home')" :disabled="rbBusy" > 
@@ -72,7 +72,7 @@
                                     </v-list>
                                 </v-menu>
                             </v-flex>
-                            <v-flex xs2 class="text-xs-center"> {{ axisPos(i) == null ? 'n/a' : axisPos(i) }} </v-flex>
+                            <v-flex xs2 class="text-xs-center"> {{ drivePos(i) == null ? 'n/a' : drivePos(i) }} </v-flex>
                             <v-flex xs2 class="text-xs-center hidden-xs-only">[{{drive.minPos}}; {{drive.maxPos}}]</v-flex>
                             <v-flex xs2 class="text-xs-center hidden-xs-only">{{drive.type}}</v-flex>
                             <v-flex xs2 class="text-xs-center hidden-xs-only">
@@ -205,7 +205,7 @@ export default {
                 headers: {}
             })
         },
-        axisPos(iAxis) {
+        drivePos(iAxis) {
             var position = this.restBundleService().position;
             var axis = position && position.axis;
             return axis && axis[iAxis];
