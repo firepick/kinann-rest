@@ -26,12 +26,16 @@
                     </v-card-actions>
                 </v-card>
             </v-dialog>
-            <!--v-btn icon light flat class="secondary" v-if="selectedDrive">
-                <v-icon>delete</v-icon>
-            </v-btn-->
-            <v-btn icon light flat class="secondary">
-                <v-icon>add</v-icon>
-            </v-btn>
+            <v-menu bottom left :offset-y="true">
+                <v-btn icon light flat class="secondary" slot="activator">
+                    <v-icon>add</v-icon>
+                </v-btn>
+                <v-list>
+                    <v-list-tile v-for="(item,i) in addList" :key="i" @click="addDrive(item)" >
+                        <v-list-tile-title>Add {{item}}</v-list-tile-title>
+                    </v-list-tile>
+                </v-list>
+            </v-menu>
         </v-toolbar>
         <v-list>
             <v-list-tile >
@@ -90,11 +94,11 @@
                 </v-list-tile-content>
             </v-list-tile>
         </v-list>
-        <div v-for="(drive,i) in drives" key="i">
+        <div v-for="(drive,i) in apiModelCopy.drives" key="i">
             <rb-api-dialog :apiDialog='"drive"+i' :apiSvc='_self'>
                 <span slot="title">{{drive.name}} Drive{{i}} Settings</span>
                 <rb-dialog-row label="Name">
-                    <v-text-field v-model='drives[i].name' :rules="[apiRules.required]" >
+                    <v-text-field v-model='drive.name' :rules="[apiRules.required]" >
                     </v-text-field>
                 </rb-dialog-row>
                 <rb-dialog-row label="Homing">
@@ -129,6 +133,7 @@
                 </rb-dialog-row>
                 <kr-belt-drive v-show='drive.type === "BeltDrive"' :drive="drive"></kr-belt-drive>
                 <kr-screw-drive v-show='drive.type === "ScrewDrive"' :drive="drive"></kr-screw-drive>
+                <kr-gear-drive v-show='drive.type === "GearDrive"' :drive="drive"></kr-gear-drive>
             </rb-api-dialog>
         </div>
 
@@ -139,6 +144,7 @@
 </template>
 <script>
 
+import KrGearDrive from "./KrGearDrive.vue";
 import KrBeltDrive from "./KrBeltDrive.vue";
 import KrScrewDrive from "./KrScrewDrive.vue";
 import rbvue from "rest-bundle/index-vue";
@@ -165,6 +171,11 @@ export default {
             confirmDelete: false,
             apiSvc: this,
             selectedDrive: null,
+            addList:[
+                "BeltDrive",
+                "ScrewDrive",
+                "GearDrive",
+            ],
             homeable: [{
                 text: "Home to limit switch",
                 value: true,
@@ -178,6 +189,9 @@ export default {
             },{
                 text: "ScrewDrive",
                 value: "ScrewDrive",
+            },{
+                text: "GearDrive",
+                value: "GearDrive",
             }],
             error:"",
             newPos:"",
@@ -224,6 +238,19 @@ export default {
                 this.confirmDelete = false;
             }
         },
+        addDrive(driveType) {
+            this.$http.get(this.restOrigin() + "/" + this.service+"/drives/" + driveType)
+            .then(res => {
+                console.log(res.data);
+                console.log("addDrive", driveType)
+                var apiModelCopy = this.apiEdit();
+                apiModelCopy.drives.push(res.data);
+                this.apiSave();
+            })
+            .catch(err => {
+                console.error(err);
+            });
+        },
     },
     computed: {
         drives() {
@@ -232,6 +259,7 @@ export default {
     },
     components: {
         KrBeltDrive,
+        KrGearDrive,
         KrScrewDrive,
         RbApiDialog,
     },

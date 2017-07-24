@@ -8,12 +8,16 @@
         <rb-about-item name="about" value="false" slot="prop">Show this descriptive text</rb-about-item>
         <rb-about-item name="drive" slot="prop">BeltDrive object</rb-about-item>
     </rb-about>
-    <v-layout row wrap>
+    <v-layout align-baseline row wrap>
         <v-flex xs3> <v-subheader>Belt drive</v-subheader> </v-flex>
         <v-flex xs3 v-tooltip:top='{html:"Number of drive pulley teeth"}'> 
             <v-text-field label="Pulley Teeth" v-model="drive.teeth" ></v-text-field> </v-flex>
         <v-flex xs3 v-tooltip:top='{html:"Belt tooth separation in mm"}'> 
             <v-text-field label="Pitch" v-model="drive.teeth" ></v-text-field> </v-flex>
+    </v-layout>
+    <v-layout v-if="about" align-baseline row wrap class="grey--text text--darken-1">
+        <v-flex xs3> <v-subheader>Properties</v-subheader> </v-flex>
+        <v-flex xs6 >{{sampleDrive}}</v-flex>
     </v-layout>
 </div>
 
@@ -49,6 +53,11 @@ export default {
         },
     },
     data() { return {} },
+    computed: {
+        sampleDrive() {
+            return defaultDrive();
+        },
+    },
 }
 
 </script><style>
