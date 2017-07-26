@@ -36,7 +36,7 @@
                 ]),
             });
             this.apiDrives = `KinannRest.${name}.drives`;
-            this.options = Object.assign({},options);
+            this.options = Object.assign({}, options);
             var drives = options.drives || [
                 new StepperDrive.BeltDrive(),
                 new StepperDrive.BeltDrive(),
@@ -65,7 +65,7 @@
 
         driveName(iDrive) {
             var name = DRIVE_NAMES[iDrive];
-            return name || ("Drive"+iDrive);
+            return name || ("Drive" + iDrive);
         }
 
         positionResponse() {
@@ -119,32 +119,32 @@
         loadApiModel(filePath) {
             return new Promise((resolve, reject) => {
                 super.loadApiModel(filePath)
-                .then(model => {
-                    if (model) {
-                        this.updateDrives(model.drives);
-                        resolve(model);
-                    } else if (filePath === this.apiDrives) {
-                        resolve({
-                            drives: this.drives,
-                        });
-                    } else {
-                        reject(new Error("unknown api model:"+filePath));
-                    }
-                })
-                .catch(err => reject(err));
+                    .then(model => {
+                        if (model) {
+                            this.updateDrives(model.drives);
+                            resolve(model);
+                        } else if (filePath === this.apiDrives) {
+                            resolve({
+                                drives: this.drives,
+                            });
+                        } else {
+                            reject(new Error("unknown api model:" + filePath));
+                        }
+                    })
+                    .catch(err => reject(err));
             });
         }
 
         saveApiModel(model, filePath) {
             return new Promise((resolve, reject) => {
                 super.saveApiModel(model, filePath)
-                .then(res => {
-                    if (filePath === this.apiDrives) {
-                        this.updateDrives(model.drives);
-                    }
-                    resolve(res);
-                })
-                .catch(e => reject(e));
+                    .then(res => {
+                        if (filePath === this.apiDrives) {
+                            this.updateDrives(model.drives);
+                        }
+                        resolve(res);
+                    })
+                    .catch(e => reject(e));
             });
         }
 
