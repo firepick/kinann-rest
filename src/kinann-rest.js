@@ -1,9 +1,7 @@
 (function(exports) {
-    const Kinann = require("kinann");
-    const Factory = Kinann.Factory;
-    const Variable = Kinann.Variable;
-    const StepperDrive = Kinann.StepperDrive;
-    const DriveFrame = Kinann.DriveFrame;
+    const Variable = require("drive-frame").Variable;
+    const StepperDrive = require("drive-frame").StepperDrive;
+    const DriveFrame = require("drive-frame").DriveFrame;
     const winston = require('winston');
     const path = require("path");
     const rb = require("rest-bundle");

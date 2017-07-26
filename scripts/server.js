@@ -5,10 +5,10 @@ const express = require('express');
 const app = module.exports = express();
 const rb = require("rest-bundle");
 const KinannRest = require("../src/kinann-rest");
-const kinann = require("kinann");
-const MockSerial = kinann.serial.MockSerial;
-const MockFireStep = kinann.serial.MockFireStep;
-const FireStepDriver = kinann.serial.FireStepDriver;
+const drive_frame = require("drive-frame");
+const MockSerial = drive_frame.serial.MockSerial;
+const MockFireStep = drive_frame.serial.MockFireStep;
+const FireStepDriver = drive_frame.serial.FireStepDriver;
 const winston = require("winston");
 
 // ensure argv is actually for script instead of mocha

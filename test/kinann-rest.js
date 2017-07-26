@@ -93,7 +93,6 @@
                 var app = testInit();
                 var response = yield supertest(app).get("/test/drives/ScrewDrive").expect((res) => {
                     res.statusCode.should.equal(200);
-                    console.log("res", res.body);
                     should.deepEqual(res.body, expectedScrewDrive("A"));
                 }).end((e,r) => e ? async.throw(e) : async.next(r));
                 done();
@@ -110,7 +109,6 @@
                 var app = testInit();
                 var response = yield supertest(app).get("/test/drives/BeltDrive").expect((res) => {
                     res.statusCode.should.equal(200);
-                    console.log("res", res.body);
                     should.deepEqual(res.body, expectedBeltDrive("A"));
                 }).end((e,r) => e ? async.throw(e) : async.next(r));
                 done();
@@ -127,7 +125,6 @@
                 var app = testInit();
                 var response = yield supertest(app).get("/test/drives/GearDrive").expect((res) => {
                     res.statusCode.should.equal(200);
-                    console.log("res", res.body);
                     should.deepEqual(res.body, expectedGearDrive("A"));
                 }).end((e,r) => e ? async.throw(e) : async.next(r));
                 done();
