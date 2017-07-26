@@ -3,6 +3,7 @@
     const StepperDrive = require("drive-frame").StepperDrive;
     const DriveFrame = require("drive-frame").DriveFrame;
     const winston = require('winston');
+    const srcPkg = require("../package.json");
     const path = require("path");
     const rb = require("rest-bundle");
     const DRIVE_NAMES = [
@@ -20,7 +21,7 @@
     class RestServer extends rb.RestBundle {
         constructor(name = "test", options = {}) {
             super(name, Object.assign({
-                srcPkg: require("../package.json"),
+                srcPkg,
             }, options));
 
             Object.defineProperty(this, "handlers", {
@@ -35,7 +36,7 @@
                     this.resourceMethod("post", "home", this.postHome),
                 ]),
             });
-            this.apiDrives = `RestServer.${name}.drives`;
+            this.apiDrives = `${srcPkg.name}.${name}.drives`;
             this.options = Object.assign({}, options);
             var drives = options.drives || [
                 new StepperDrive.BeltDrive(),
