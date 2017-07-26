@@ -10,7 +10,7 @@ import Dev from './Dev.vue';
 import Introduction from './Introduction.vue';
 import AllServices from './AllServices.vue';
 import Service from './Service.vue';
-import KinannRest from "../../index-vue";
+import appvue from "../../index-vue";
 require('./stylus/main.styl')
 
 Vue.use(VueAxios, axios);
@@ -18,7 +18,7 @@ Vue.use(Vuex);
 Vue.use(Vuetify);
 Vue.use(VueRouter);
 Vue.use(rbvue);
-Vue.use(KinannRest);
+Vue.use(appvue);
 
 var routes = [{
         path: '/',
@@ -38,7 +38,7 @@ var routes = [{
     },
 ];
 routes = routes.concat(rbvue.methods.aboutRoutes());
-routes = routes.concat(rbvue.methods.aboutRoutes(KinannRest.components));
+routes = routes.concat(rbvue.methods.aboutRoutes(appvue.components));
 
 const router = new VueRouter({
     routes

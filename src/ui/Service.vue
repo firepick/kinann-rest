@@ -19,8 +19,8 @@
     </v-card-text>
     <v-card-text v-show="mode==='configure'">
         <h6>Configuration</h6>
-        <v-card hover v-tooltip:bottom='{html:"<kr-config/>"}'>
-            <kr-config class="mb-3" :service="serviceFromUrl"/>
+        <v-card hover v-tooltip:bottom='{html:"<kr-drives/>"}'>
+            <kr-drives class="mb-3" :service="serviceFromUrl"/>
         </v-card>
     </v-card-text>
     <v-card-text v-show="mode==='operate'">

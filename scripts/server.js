@@ -4,7 +4,7 @@ const path = require("path");
 const express = require('express');
 const app = module.exports = express();
 const rb = require("rest-bundle");
-const KinannRest = require("../src/kinann-rest");
+const RestServer = require("../src/rest-server");
 const drive_frame = require("drive-frame");
 const MockSerial = drive_frame.serial.MockSerial;
 const MockFireStep = drive_frame.serial.MockFireStep;
@@ -35,8 +35,8 @@ let async = function*() {
             var serviceName = services[iService];
             var serialDriver = new FireStepDriver({ allowMock: true, });
             var sp = yield serialDriver.open().then(r=>async.next(r)).catch(e=>async.throw(e));
-            winston.info("KinannRest", serviceName, "connected to", sp.path);
-            restBundles.push(new KinannRest(serviceName, { serialDriver }));
+            winston.info("RestServer", serviceName, "connected to", sp.path);
+            restBundles.push(new RestServer(serviceName, { serialDriver }));
         }
 
         // declare ports

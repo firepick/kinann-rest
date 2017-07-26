@@ -1,9 +1,9 @@
 (function(exports) {
     ///////////////// class ////////////////////
     var pkg = {
-        KinannRest: require("./src/kinann-rest"),
+        RestServer: require("./src/rest-server"),
     };
 
-    module.exports = exports.KinannRest = pkg;
+    module.exports = exports.RestServer = pkg;
 })(typeof exports === "object" ? exports : (exports = {}));
 

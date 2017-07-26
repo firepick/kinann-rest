@@ -17,8 +17,8 @@
         'F',
     ];
 
-    class KinannRest extends rb.RestBundle {
-        constructor(name = "kinann", options = {}) {
+    class RestServer extends rb.RestBundle {
+        constructor(name = "test", options = {}) {
             super(name, Object.assign({
                 srcPkg: require("../package.json"),
             }, options));
@@ -35,7 +35,7 @@
                     this.resourceMethod("post", "home", this.postHome),
                 ]),
             });
-            this.apiDrives = `KinannRest.${name}.drives`;
+            this.apiDrives = `RestServer.${name}.drives`;
             this.options = Object.assign({}, options);
             var drives = options.drives || [
                 new StepperDrive.BeltDrive(),
@@ -171,7 +171,7 @@
             return result;
         }
 
-    } //// class KinannRest
+    } //// class RestServer
 
-    module.exports = exports.KinannRest = KinannRest;
+    module.exports = exports.RestServer = RestServer;
 })(typeof exports === "object" ? exports : (exports = {}));

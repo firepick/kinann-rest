@@ -1,11 +1,11 @@
-(typeof describe === 'function') && describe("KinannRest", function() {
+(typeof describe === 'function') && describe("RestServer", function() {
     const should = require("should");
-    const KinannRest = require("../src/kinann-rest");
+    const RestServer = require("../src/rest-server");
     const supertest = require('supertest');
     const winston = require('winston');
     const rb = require('rest-bundle');
     const fs = require('fs');
-    const DRIVES_PATH = 'api-model/KinannRest.test.drives.json';
+    const DRIVES_PATH = 'api-model/RestServer.test.drives.json';
     var rbh = new rb.RbHash();
     var app = require("../scripts/server.js");
     winston.level = "warn";
@@ -162,7 +162,7 @@
                     res.statusCode.should.equal(200);
                     should.deepEqual(res.body.apiModel, apiModel);
                 }).end((e,r) => e ? async.throw(e) : async.next(r));
-                var kr = app.locals.restBundles.filter(rb => rb instanceof KinannRest)[0];
+                var kr = app.locals.restBundles.filter(rb => rb instanceof RestServer)[0];
                 should.ok(kr);
                 kr.drives[0].maxPos.should.equal(101);
                 done();
@@ -177,7 +177,7 @@
         var async = function* () {
             try {
                 var app = testInit();
-                var kr = app.locals.restBundles.filter(rb => rb instanceof KinannRest)[0];
+                var kr = app.locals.restBundles.filter(rb => rb instanceof RestServer)[0];
                 should.ok(kr);
                 fs.existsSync(DRIVES_PATH) && fs.unlinkSync(DRIVES_PATH);
                 var result = yield supertest(app).get('/test/drives').expect(res => {

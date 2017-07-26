@@ -37,17 +37,17 @@
               </v-list-tile>
             </div>
         </v-list-group>
-        <v-list-group value="sidebarKinannRest">
+        <v-list-group value="sidebarAppRest">
             <v-list-tile slot="item">
               <v-list-tile-action> <v-icon >description</v-icon> </v-list-tile-action>
               <v-list-tile-content>
-                <v-list-tile-title>KinannRest Components</v-list-tile-title>
+                <v-list-tile-title>{{package.name}} Components</v-list-tile-title>
               </v-list-tile-content>
               <v-list-tile-action>
                 <v-icon dark>keyboard_arrow_down</v-icon>
               </v-list-tile-action>
             </v-list-tile>
-            <div v-for="(item,i) in sidebarKinannRest" :key="i">
+            <div v-for="(item,i) in sidebarAppRest" :key="i">
               <v-list-tile exact :to="item.href">
                 <v-list-tile-content>
                     <v-list-tile-title>{{ item.title }}</v-list-tile-title>
@@ -87,7 +87,7 @@ import KrDrives from './KrDrives.vue';
 import KrBeltDrive from './KrBeltDrive.vue';
 import KrScrewDrive from './KrScrewDrive.vue';
 import rbvue from "rest-bundle/index-vue";
-import krvue from "../../index-vue";
+import appvue from "../../index-vue";
 
 export default {
     name: 'dev',
@@ -109,7 +109,7 @@ export default {
                 href: "/service",
             }],
             sidebarRestBundle: rbvue.methods.aboutSidebar(rbvue.components),
-            sidebarKinannRest: rbvue.methods.aboutSidebar(krvue.components),
+            sidebarAppRest: rbvue.methods.aboutSidebar(appvue.components),
         }
     },
     methods: {
