@@ -58,7 +58,7 @@ import Vue from "vue";
 export default {
     mixins: [ 
         rbvue.mixins.RbAboutMixin, 
-        rbvue.mixins.RbServiceMixin,
+        rbvue.mixins.RbApiMixin.createMixin("position"),
     ],
     methods: {
         positionStr(basis) {

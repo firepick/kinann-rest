@@ -166,7 +166,6 @@ export default {
     props: {
     },
     data: function() {
-        this.restBundleModel();
         return {
             confirmDelete: false,
             apiSvc: this,
@@ -264,6 +263,7 @@ export default {
         RbApiDialog,
     },
     created() {
+        this.restBundleModel();
         this.rbDispatch("apiLoad");
     },
     mounted() {

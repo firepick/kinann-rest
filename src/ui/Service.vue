@@ -57,7 +57,7 @@ import KrDrives  from './KrDrives.vue';
 
 export default {
     name: "service",
-    mixins: [ rbvue.mixins.RbServiceMixin ],
+    mixins: [ rbvue.mixins.RbApiMixin.createMixin("service") ],
     data: function() {
         return {
             loading: false,
