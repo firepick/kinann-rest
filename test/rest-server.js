@@ -3,9 +3,10 @@
     const RestServer = require("../src/rest-server");
     const supertest = require('supertest');
     const winston = require('winston');
+    const srcPkg = require("../package.json");
     const rb = require('rest-bundle');
     const fs = require('fs');
-    const DRIVES_PATH = 'api-model/RestServer.test.drives.json';
+    const DRIVES_PATH = `api-model/${srcPkg.name}.test.drives.json`;
     var rbh = new rb.RbHash();
     var app = require("../scripts/server.js");
     winston.level = "warn";
